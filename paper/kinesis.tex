@@ -1,0 +1,86 @@
+\documentclass[modern,manuscript]{aastex61}
+
+% to-do list
+% ----------
+% - Add items here
+
+% style notes
+% -----------
+% - This file generates by Makefile; don't be typing ``pdflatex'' or some bullshit.
+% - Line break between sentences to make the git diffs readable.
+% - Use \, as a multiply operator.
+% - Reserve () for function arguments; use [] or {} for outer shit.
+% - Use \sectionname not Section, \figname not Figure, \documentname not Article or Paper or paper.
+
+
+% packages
+\definecolor{cbblue}{HTML}{3182bd}
+\usepackage{microtype}  % ALWAYS!
+\usepackage{amsmath,amssymb,natbib}
+\hypersetup{backref,breaklinks,colorlinks,urlcolor=cbblue,linkcolor=cbblue,citecolor=black}
+
+% graphicspath specifies where to look for figures. It is important to include
+% the trailing / as this rewrites the includegraphics path to start with the
+% graphics path specified above, if the file exists.
+% Relative paths recommended.
+\graphicspath{{./figures/}}
+
+
+% define macros for text
+\newcommand{\documentname}{Article}
+\newcommand{\sectionname}{Section}
+\newcommand{\figname}{Figure}
+\newcommand{\eqname}{Equation}
+\newcommand{\etal}{\textit{et al}.}
+\newcommand{\project}[1]{\textsl{#1}}
+\newcommand{\acronym}[1]{{\small{#1}}}
+\newcommand{\gaia}{\project{Gaia}}
+\newcommand{\rave}{\project{\acronym{RAVE}}}
+\newcommand{\apogee}{\project{\acronym{APOGEE}}}
+\newcommand{\tmass}{\project{\acronym{2MASS}}}
+\newcommand{\dr}{\acronym{DR1}}
+\newcommand{\tgas}{\acronym{TGAS}}
+
+
+% define macros for math
+\newcommand{\kms}{\ensuremath{\rm km~s^{-1}}}
+\newcommand{\msun}{{\rm M}_\odot}
+\newcommand{\pc}{{\rm pc}}
+\newcommand{\given}{\,|\,}
+\newcommand{\normal}{{\mathcal{N}}}
+\newcommand{\dd}{\mathrm{d}}
+\newcommand{\transp}[1]{{#1}^{\!\mathsf{T}}}
+\newcommand{\inv}[1]{{#1}^{-1}}
+\newcommand{\bs}[1]{\boldsymbol{#1}}
+\newcommand{\vperp}{\bs{v}^\perp}
+\newcommand{\propm}{\bs{\mu}}
+\newcommand{\mat}[1]{\mathbf{#1}}
+\renewcommand{\vec}[1]{\bs{#1}}
+\newcommand{\data}{\mathrm{data}}
+\newcommand{\snr}{[S/N]_\varpi}
+
+\newcommand{\todo}[1]{{\color{blue}TODO:#1}}
+
+
+\begin{document}\sloppy\sloppypar\raggedbottom\frenchspacing % trust me
+
+
+\title{ Kinematic modelling of clusters with Gaia }
+
+\author{
+  Semyeong Oh
+}
+
+\begin{abstract}
+  Abstract goes here
+\end{abstract}
+
+\section{Introduction}
+\label{sec:introduction}
+
+
+
+
+% \bibliography{ref}
+
+\end{document}
