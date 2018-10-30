@@ -79,26 +79,55 @@
 \label{sec:introduction}
 
 
+
+
+\begin{equation}
+  \begin{split}
+    \vec{u_i} = \vec{v_0} + \mat{T} \cdot (\vec{b_i}-\vec{b_0}) + \vec{\sigma}_i \\
+    \vec{v_0} = \mathrm{constant},\,\, \vec{\sigma}_i \sim \normal(\vec{0},\,\sigma^2\mat{I})
+  \end{split}
+\end{equation}
+The proper motion is
+\begin{equation}
+  \mu_i = \pi_i \vec{\hat\mu}_i^T \cdot \vec{u}_i
+    = \pi_i \vec{\hat\mu}_i^T \cdot \left(\vec{v}_0 + \mat{T}\cdot(\vec{b}_i-\vec{b}_0)+\vec{\sigma}_i\right)
+\end{equation}
+The residual proper motion is
+\begin{equation}
+  \Delta{\mu} = \vec{\mu}_i/\pi_i - \vec{\hat\mu}_i^T \cdot \vec{v}_0 =
+    \vec{\hat\mu}_i^T \cdot \left[ \mat{T}\cdot(\vec{b}_i-\vec{b}_0) + \vec{\sigma}_i\right]
+\end{equation}
+If $\mat{T}=\mat{0}$,
+\begin{equation}
+  \Delta\mu = \vec{\hat\mu}_i^T \vec{\sigma}_i
+\end{equation}
+For equatorial coordinates,
+\begin{equation}
+  \begin{split}
+    \vec{\hat\mu}_{i,\,\alpha}^T = (-\sin\alpha_i,\,\cos\alpha_i,\,0) \\
+    \vec{\hat\mu}_{i,\,\delta}^T = (-\sin\delta_i \cos\alpha_i,\,-\sin\delta_i \sin\alpha_i,\,\cos\delta_i) \\
+  \end{split}
+\end{equation}
+
+
 There are variants of inference on the same key assumption that
 a group of stars are comoving.
 
-moving cluster method:
+\noindent{\bf Moving cluster method}: If we know proper motions and radial velocities of stars
+($\mu_i$ and $\vec{v}_0$), we can infer parallaxes $\pi_i$.
 
-Astrometric radial velocity:
-If we have astrometric parameters measured for a group of stars that you can
-assume to have an identical 3D velocity, because the velocity vector projects
-slightly differently for different positions on the celestial sphere,
-we can infer the missing (radial) velocity component.
-This assumption has been put to use to determine distances
+\noindent{\bf Astrometric radial velocity}:
+If we have astrometric parameters ($\mu_i$ and $\pi_i$) measured for a group of
+stars that you can assume to have an identical 3D velocity, because the
+velocity vector projects slightly differently for different positions on the
+celestial sphere, we can infer the missing (radial) velocity component ($\vec{v}_0$).
 
-Given the \gaia\ data which improves the data quality,
-are more complicated models warranted?
-
-\section{Setup}
-- define all symbols
-- analytic description
 
 \section{Case in point: the Hyades cluster}
+
+Given the \gaia\ data which improves the data quality,
+are more complicated models where $\mat{T}\neq\mat{0}$ warranted?
+
 
 
 

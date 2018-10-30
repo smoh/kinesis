@@ -12,7 +12,7 @@ all: ${NAME}.pdf
 
 ${NAME}.pdf: ${NAME}.tex $(wildcard figures/*.pdf)
 	${LATEX} ${NAME}
-	bibtex ${NAME}
+	# bibtex ${NAME}
 	${LATEX} ${NAME}
 	( grep "Rerun to get" ${NAME}.log && ${LATEX} ${NAME} ) || echo "Done."
 	( grep "Rerun to get" ${NAME}.log && ${LATEX} ${NAME} ) || echo "Done."
