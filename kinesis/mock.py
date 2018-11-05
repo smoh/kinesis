@@ -9,6 +9,7 @@ import astropy.units as u
 
 __all__ = ['Cluster']
 
+
 class Cluster(object):
     """class representing a mock star cluster"""
     def __init__(self, v0, sigmav, omegas=None, ws=None, k=0, b0=None):
@@ -16,19 +17,20 @@ class Cluster(object):
         Make a cluster with mean velocity `v0` and dispersion `sigma`
 
         v0 : array-like, (3,)
-            Mean velocity vector
+            Mean velocity vector in km/s
         sigmav : float
-            (Isotropic) velocity dispersion
-        
-        omegas : array-like, (3,)
-            angular frequencies of rotation around x, y, z axis
-        ws : array-like, (5,)
-            
-        k : float
-            
-        b0 : array-like, (3,)
-            A (random) reference position vector
+            (Isotropic) velocity dispersion in km/s
+        omegas : array-like, (3,), optional
+            Angular frequencies of rotation around x, y, z axis
+        ws : array-like, (5,), optional
+            Non-isotropic dilation
+        k : float, optional
+            Isotropic expansion (or contraction)
+        b0 : array-like, (3,), optional
+            Reference position vector where velocity field v = v0.
+            Only matters when at least one of `omegas`, `ws` and `k` is non-zero.
         """
+        # TODO option to accept astropy Quantities for parameters
         v0 = np.atleast_1d(v0)
         assert v0.shape == (3,), "v0 has a wrong shape"
         if b0 is not None:
@@ -52,6 +54,7 @@ class Cluster(object):
         self.k = k
 
         # construct tensor T from omegas, ws and k
+        # velocity field at b is v(b) = v0 + T(b-b0)
         T = np.array([[ws[3], ws[2]-omegas[2], ws[1]+omegas[1]],
                       [ws[2]+omegas[2], ws[4], ws[0]-omegas[0]],
                       [ws[1]-omegas[1], ws[0]+omegas[0], 3*k-ws[3]-ws[4]]])
@@ -64,6 +67,14 @@ class Cluster(object):
 
     @classmethod
     def from_coord(cls, cluster_coord, sigmav, omegas=None, ws=None):
+        """
+        Make a cluster from astropy coordinates `cluster_coord`
+
+        cluster_coord : astropy.coordinates.BaseCoordinateFrame instance
+            coordinates containing cluster position and velocity
+
+        The rest of the arguments are the same as `Cluster`.
+        """
         if not isinstance(cluster_coord, coord.BaseCoordinateFrame):
             raise ValueError("`coord` must be an astropy coordinate instance.")
         if cluster_coord.shape:
@@ -88,7 +99,7 @@ class Cluster(object):
         positions : astropy.coordinates.BaseCoordinateFrame instance
             positions of member stars
 
-        Returns coordinates with velocities populated
+        Returns ICRS coordinates with velocities populated
         """
         if not isinstance(positions, coord.BaseCoordinateFrame):
             raise ValueError("`positions` should be astropy coordinates")
@@ -97,8 +108,8 @@ class Cluster(object):
         bi = icrs.cartesian.xyz.to(u.pc).value
         assert bi.shape == (3, N), "WTF"
         if self.b0 is not None:
-            bi -= self.b0[:,None]
-        ui = self.v0 + np.random.normal([0,0,0], scale=self.sigmav, size=(N,3))
+            bi -= self.b0[:, None]
+        ui = self.v0 + np.random.normal([0, 0, 0], scale=self.sigmav, size=(N, 3))
         ui += np.einsum('ij,jN->Ni', self.T, bi)
         return coord.ICRS(*icrs.cartesian.xyz,
                           v_x=ui.T[0]*u.km/u.s, v_y=ui.T[1]*u.km/u.s, v_z=ui.T[2]*u.km/u.s,
