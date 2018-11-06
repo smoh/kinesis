@@ -11,10 +11,10 @@ ROOT = os.path.abspath(os.path.dirname(__file__))
 __all__ = ['get_model']
 
 def model_path(model_name):
-    return os.path.join(ROOT, 'stan', name+'.stan')
+    return os.path.join(ROOT, 'stan', model_name+'.stan')
 
 def model_cache_path(model_name):
-    return os.path.join(ROOT, 'stan', name+'.pkl')
+    return os.path.join(ROOT, 'stan', model_name+'.pkl')
 
 
 def get_model(model_name):
