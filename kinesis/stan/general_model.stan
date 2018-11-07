@@ -59,7 +59,7 @@ transformed parameters {
 
   if (Nrv > 0)
     for(i in 1:Nrv) {
-      rv_model[irv[i]+1] = M[irv[i]+1, 3] * v0;
+      rv_model[i] = M[irv[i]+1, 3] * v0;
     }
 }
 
@@ -84,6 +84,6 @@ model {
 
   if(Nrv > 0)
     for(i in 1:Nrv) {
-      rv[irv[i]+1] ~ normal(rv_model[irv[i]+1], sqrt(sigv^2 + (rv_error[irv[i]+1])^2));
+      rv[i] ~ normal(rv_model[i], sqrt(sigv^2 + (rv_error[i])^2));
     }
 }
