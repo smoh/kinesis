@@ -372,3 +372,4 @@ venv.bak/
 dmypy.json
 
 
+.tags*
