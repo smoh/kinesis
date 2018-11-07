@@ -189,7 +189,7 @@ class ClusterMembers(object):
             'dec': sph.lat.deg,
             'parallax': 1/sph.distance.to(u.kpc).value,
             # NOTE: `d_lon` should be multiplied by cos(`lat`)!
-            'pmra': sph.differentials['s'].d_lon.to(u.mas/u.yr).value,
+            'pmra': sph.differentials['s'].d_lon.to(u.mas/u.yr).value * np.cos(sph.lat.rad),
             'pmdec': sph.differentials['s'].d_lat.to(u.mas/u.yr).value,
             'radial_velocity': sph.differentials['s'].d_distance.to(u.km/u.s).value
         })
