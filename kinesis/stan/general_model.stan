@@ -1,3 +1,4 @@
+// TODO: add strain rate tensor; make it optional?
 data {
   int<lower=2> N;       // number of stars
   int<lower=0> Nrv;     // number of stars with RVs
