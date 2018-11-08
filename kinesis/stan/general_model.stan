@@ -18,6 +18,14 @@ data {
   real rv[Nrv];          // radial velocity [km/s]
   real rv_error[Nrv];    // radial velocity error [km/s]
 
+  // 1 if include T matrix
+  int<lower=0, upper=1> include_T;
+  // b0 is the reference position where v = v0
+  // equatorial [x, y, z] in pc
+  vector[3] b0;
+  // b0 only used when include_T == 1.
+  // vector[3] b0[include_T ? 0 : 1];     // reference position where v = v0
+
 }
 
 transformed data {
@@ -46,22 +54,41 @@ parameters {
   vector<lower=0>[N] d;     // true distances [pc]
   vector[3] v0;             // mean velocity  [km/s]
   real<lower=0> sigv;       // dispersion     [km/s]
+
+  matrix[3, 3] T[include_T ? 1 : 0];
 }
 
 transformed parameters {
   vector[3] a_model[N];
   real rv_model[Nrv];
+  vector[3] b[N];
+
+  matrix[3, 3] T_param;
+  if (include_T) {
+    T_param = T[1];
+  } else {
+    T_param = rep_matrix(0., 3, 3);
+  }
+  // print(T_param);
+
+
+  for (j in 1:N) {
+    b[j][1] = d[j] * cos(dec_rad[j]) * cos(ra_rad[j]);
+    b[j][2] = d[j] * cos(dec_rad[j]) * sin(ra_rad[j]);
+    b[j][3] = d[j] * sin(dec_rad[j]);
+  }
 
   for(i in 1:N) {
     a_model[i][1] = 1000./d[i];
-    a_model[i][2] = M[i,1] * v0 / (d[i]/1000.) / 4.74;
-    a_model[i][3] = M[i,2] * v0 / (d[i]/1000.) / 4.74;
+    a_model[i][2] = M[i,1] * (v0 + T_param*(b[i] - b0)) / (d[i]/1000.) / 4.74;
+    a_model[i][3] = M[i,2] * (v0 + T_param*(b[i] - b0)) / (d[i]/1000.) / 4.74;
   }
 
-  if (Nrv > 0)
+  if (Nrv > 0) {
     for(i in 1:Nrv) {
       rv_model[i] = M[irv[i]+1, 3] * v0;
     }
+  }
 }
 
 model {
