@@ -118,6 +118,16 @@ class Cluster(object):
         return cls(b0, v0, sigmav, omegas=omegas, ws=ws)
 
     def sample_sphere(self, N=1, Rmax=10):
+        """
+        Smple cluster members around mean position with uniform density
+
+        N : int
+            number of stars
+        Rmax : float
+            maximum radius from the mean position in pc
+            
+        Returns self with `members` attribute populated.
+        """
         if self.members:
             raise AttributeError('The cluster already have members.')
         xyz_coords = sample_uniform_sphere(x0=self.b0, Rmax=Rmax, N=N, return_icrs=True)
@@ -130,7 +140,7 @@ class Cluster(object):
         positions : astropy.coordinates.BaseCoordinateFrame instance
             positions of member stars
 
-        Returns ICRS coordinates with velocities populated
+        Returns self with `members` attribute populated.
         """
         if not isinstance(positions, coord.BaseCoordinateFrame):
             raise ValueError("`positions` should be astropy coordinates")
