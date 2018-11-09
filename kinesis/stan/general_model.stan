@@ -1,4 +1,4 @@
-// TODO: add strain rate tensor; make it optional?
+// TODO: clean up and make note of units
 data {
   int<lower=2> N;       // number of stars
   int<lower=0> Nrv;     // number of stars with RVs
@@ -58,6 +58,7 @@ parameters {
   matrix[3, 3] T[include_T ? 1 : 0];
 }
 
+// transformed parameters are stored, too.
 transformed parameters {
   vector[3] a_model[N];
   real rv_model[Nrv];
