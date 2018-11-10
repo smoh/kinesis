@@ -59,9 +59,13 @@ class TestCluster(object):
         assert (cl.members.data.parallax_pmdec_corr == 0).all()
         assert (cl.members.data.pmra_pmdec_corr == 0).all()
 
-        import pandas as pd
-        d = pd.read_csv("/Users/semyeong/projects/spelunky/oh17-dr2/dr2_vL_clusters_full.csv")\
-            .groupby('cluster').get_group('Hyades')
-        cl = mock.Cluster(v0, sigv)\
+        # Feed dataframe to test errors_from
+        cl2 = mock.Cluster(v0, sigv)\
             .sample_sphere(N=N, Rmax=1)\
-            .observe(error_from=d)
+            .observe(error_from=cl.members.data)
+        assert (cl2.members.data.pmra_error == 2).all()
+        assert (cl2.members.data.pmdec_error == 2).all()
+        assert (cl2.members.data.parallax_error == 2).all()
+        assert (cl2.members.data.parallax_pmra_corr == 0).all()
+        assert (cl2.members.data.parallax_pmdec_corr == 0).all()
+        assert (cl2.members.data.pmra_pmdec_corr == 0).all()
