@@ -9,6 +9,8 @@ import pandas as pd
 import astropy.coordinates as coord
 import astropy.units as u
 
+from .utils import cov_from_gaia_table
+
 __all__ = ['sample_uniform_sphere', 'Cluster']
 
 
@@ -125,7 +127,7 @@ class Cluster(object):
             number of stars
         Rmax : float
             maximum radius from the mean position in pc
-            
+
         Returns self with `members` attribute populated.
         """
         if self.members:
@@ -167,6 +169,16 @@ class Cluster(object):
             return 0
         return self.members.N
 
+    def observe(self, *args, **kwargs):
+        # NOTE: this is to still have Cluster at the end of method chaining.
+        """
+        Add noise to cluster members. See `Cluster.members.observe`.
+        """
+        if self.members is None:
+            raise ValueError("`members` is None; you cannot observe an empty cluster")
+        self.members.observe(*args, **kwargs)
+        return self
+
 
 class ClusterMembers(object):
     """ class representing members of a Mock cluster """
@@ -184,7 +196,10 @@ class ClusterMembers(object):
             number of members
         icrs : astropy.coordinates.ICRS instance
             ICRS coordinates with spherical representation
-
+        df : pandas.DataFrame
+            simulated data without noise with Gaia-like columns
+        data : pandas.DataFrame
+            simulated data with noise with Gaia-like columns
         """
         if hasattr(coordinates, 'differentials'):
             raise ValueError("`coordinates` should have differentials")
@@ -204,6 +219,7 @@ class ClusterMembers(object):
             'radial_velocity': sph.differentials['s'].d_distance.to(u.km/u.s).value
         })
         self.df = df
+        self.data = None
 
         # To have natural attributes of ICRS, make it again with spherical
         # representation
@@ -215,4 +231,52 @@ class ClusterMembers(object):
             radial_velocity=df.radial_velocity.values*u.km/u.s
         )
 
-        # def add_errors(self)
+    def observe(self, cov=None, error_from=None):
+        """
+        Add noise to cluster members.
+
+        cov : array of covariance matrix
+            If `cov` is one covariance matrix (3, 3) of parallax, pmra, pmdec,
+            this is the covariance assumed for all members.
+            Otherwise it must be (N, 3, 3).
+        error_from : pandas.DataFrame
+        """
+        if (cov is not None) and (error_from is not None):
+            raise ValueError("`cov` and `error_from` are mutually exclusive.")
+        if cov is not None:
+            if cov.shape == (3, 3):
+                cov = np.repeat(cov[None, :, :], self.N, axis=0)
+            elif cov.shape == (self.N, 3, 3):
+                pass
+            else:
+                raise ValueError("Invalid `cov` shape {:r}".format(cov.shape))
+
+            a_data = np.zeros((self.N, 3))
+            for i in range(self.N):
+                a_data[i] = np.random.multivariate_normal(
+                    self.df.loc[i, ['parallax', 'pmra', 'pmdec']], cov[i])
+            data = self.df[['ra', 'dec']].copy()
+            # TODO: not sure if this is the best way
+            def cov_to_corr(cc):
+                d = np.sqrt(np.linalg.inv(np.diag(np.diag(cc))))
+                corr = d.dot(cc).dot(d)
+                return corr[np.triu_indices(3,1)]
+            parallax_pmra_corr, parallax_pmdec_corr, pmra_pmdec_corr = \
+                np.vstack(list(map(cov_to_corr, cov))).T
+            data = data.assign(
+                parallax=a_data[:,0],
+                pmra=a_data[:,1],
+                pmdec=a_data[:,2],
+                parallax_pmra_corr=parallax_pmra_corr,
+                parallax_pmdec_corr=parallax_pmdec_corr,
+                pmra_pmdec_corr=pmra_pmdec_corr,
+                parallax_error=np.sqrt(cov[:,0,0]),
+                pmra_error=np.sqrt(cov[:,1,1]),
+                pmdec_error=np.sqrt(cov[:,2,2])
+            )
+            self.data = data
+        else:
+            irand = np.random.randint(0, high=len(error_from), size=self.N)
+            cov = cov_from_gaia_table(error_from.loc[irand])
+            self.observe(cov=cov)
+        return self
