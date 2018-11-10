@@ -37,7 +37,7 @@ def cov_from_gaia_table(df):
         'parallax_pmra_corr', 'parallax_pmdec_corr',
         'pmra_pmdec_corr'])
     s = set(df.columns)
-    assert s > necessary_columns, \
+    assert s >= necessary_columns, \
         "Columns missing: {:}".format(necessary_columns-s)
     C = np.zeros([len(df), 3, 3])
     C[:, [0,1,2], [0,1,2]] = df[['parallax_error', 'pmra_error', 'pmdec_error']].values**2
