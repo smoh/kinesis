@@ -1,5 +1,6 @@
 from functools import wraps
 
+import numpy as np
 import pandas as pd
 
 __all__ = ['cache_to', 'cov_from_gaia_table']
@@ -32,9 +33,9 @@ def cov_from_gaia_table(df):
     """
     necessary_columns = set([
         'ra', 'dec', 'parallax', 'pmra', 'pmdec',
-         'parallax_error', 'pmra_error', 'pmdec_error',
-         'parallax_pmra_corr', 'parallax_pmdec_corr',
-         'pmra_pmdec_corr'])
+        'parallax_error', 'pmra_error', 'pmdec_error',
+        'parallax_pmra_corr', 'parallax_pmdec_corr',
+        'pmra_pmdec_corr'])
     s = set(df.columns)
     assert s > necessary_columns, \
         "Columns missing: {:}".format(necessary_columns-s)
