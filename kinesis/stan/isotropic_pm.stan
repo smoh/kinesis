@@ -52,8 +52,8 @@ model {
   matrix[3,3] D[N];       // modified covariance matrix
 
 
-  v0 ~ normal(0, 100);
-  sigv ~ uniform(0., 50);
+  // v0 ~ normal(0, 100);
+  // sigv ~ normal(0, 10);
 
   // likelihood
   for(i in 1:N) {
