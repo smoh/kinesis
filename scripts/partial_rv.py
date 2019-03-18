@@ -10,28 +10,11 @@ import pandas as pd
 import astropy.units as u
 import astropy.coordinates as coord
 
-# # NOTE: To prevent output from pystan, this must happen before import pystan
-# import logging
-
-# logger.setLevel(logging.ERROR)
-#
-# # add root logger (logger Level always Warning)
-# # not needed if PyStan already imported
-# logger.addHandler(logging.NullHandler())
-#
-# logger_path = "pystan.log"
-# fh = logging.FileHandler(logger_path, encoding="utf-8")
-# fh.setLevel(logging.INFO)
-# # optional step
-# formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-# fh.setFormatter(formatter)
-# logger.addHandler(fh)
-
 import kinesis
 
 np.random.seed(1038479)
 
-model = kinesis.get_model('general_model')
+model = kinesis.get_model('general_model')#, recompile=True)
 # model = kinesis.get_model('isotropic_pm')
 
 
@@ -81,6 +64,11 @@ if 1:
     C[:, 1, 1] = 1
     C[:, 2, 2] = 1
 
+    # C[:, 0, 0] = 0.3**2
+    # C[:, 1, 1] = 0.15**2
+    # C[:, 2, 2] = 0.1**2
+
+
 
     a_data = np.zeros((N, 3))
     for i in range(N):
@@ -94,7 +82,8 @@ if 1:
         return dict(
             d=1e3/df.parallax.values,
             sigv=0.5,
-            v0=v0
+            v0=v0,
+            T=np.empty(shape=(0,3,3))
         )
 
 
@@ -102,10 +91,16 @@ if 1:
         data=dict(
             N=N, ra=df.ra.values, dec=df.dec.values, a=a_data, C=C,
             Nrv=0, rv=[], rv_error=[],
-            irv=np.array([]).astype(int)   #NOTE: dtype matters!
+            irv=np.array([]).astype(int),   #NOTE: dtype matters!
+            include_T=0, b0=[0.,0.,0.]
             ),
         init=init,
         tol_param=1e-12, history_size=1)
+    print('true       ', v0, sigv)
+    print('optimizing ', r0['v0'], r0['sigv'])
+    print('opt - true ', r0['v0']-np.array(v0))
+
+
 
 
     Nrv = int(N*0.5)
@@ -117,7 +112,8 @@ if 1:
             Nrv=Nrv,
             rv=df.radial_velocity.values[irand],
             rv_error=df.radial_velocity_error.values[irand],
-            irv=irand
+            irv=irand,
+            include_T=0, b0=[0.,0.,0.]
             ),
         init=init,
         tol_param=1e-12, history_size=1)
@@ -127,7 +123,8 @@ if 1:
         data=dict(
             N=N, ra=df.ra.values, dec=df.dec.values, a=a_data, C=C,
             Nrv=N, rv=df.radial_velocity.values, rv_error=df.radial_velocity_error.values,
-            irv=np.arange(N)
+            irv=np.arange(N),
+            include_T=0, b0=[0.,0.,0.]
             ),
         init=init,
         tol_param=1e-12, history_size=1)
@@ -135,7 +132,7 @@ if 1:
     print(v0, sigv)
     print('No RV        :', r0['v0'], r0['sigv'])
     print('No RV  delta :', r0['v0']-v0, r0['sigv']-sigv)
-    print('No RV p      :', rp['v0'], rp['sigv'])
-    print('No RV p delta:', rp['v0']-v0, rp['sigv']-sigv)
+    print('part RV      :', rp['v0'], rp['sigv'])
+    print('part RV delta:', rp['v0']-v0, rp['sigv']-sigv)
     print('all RV       :', r['v0'], r['sigv'])
     print('all RV delta :', r['v0']-v0, r['sigv']-sigv)
