@@ -7,7 +7,7 @@ import astropy.coordinates as coord
 import astropy.units as u
 
 from kinesis import mock
-from kinesis import pipes
+import gapipes as pipes
 
 np.random.seed(73929)
 #
