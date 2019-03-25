@@ -218,8 +218,8 @@ class ClusterMembers(object):
             'pmdec': sph.differentials['s'].d_lat.to(u.mas/u.yr).value,
             'radial_velocity': sph.differentials['s'].d_distance.to(u.km/u.s).value
         })
-        self.df = df
-        self.data = None
+        self.truth = df
+        self.observed = None
 
         # To have natural attributes of ICRS, make it again with spherical
         # representation
@@ -233,13 +233,15 @@ class ClusterMembers(object):
 
     def observe(self, cov=None, error_from=None):
         """
-        Add noise to cluster members.
+        Add noise to cluster members using eithar covariance matrices
+        or randomly assigning Gaia dataframe.
 
         cov : array of covariance matrix
             If `cov` is one covariance matrix (3, 3) of parallax, pmra, pmdec,
             this is the covariance assumed for all members.
             Otherwise it must be (N, 3, 3).
         error_from : pandas.DataFrame
+
         """
         if (cov is not None) and (error_from is not None):
             raise ValueError("`cov` and `error_from` are mutually exclusive.")
@@ -254,8 +256,8 @@ class ClusterMembers(object):
             a_data = np.zeros((self.N, 3))
             for i in range(self.N):
                 a_data[i] = np.random.multivariate_normal(
-                    self.df.loc[i, ['parallax', 'pmra', 'pmdec']], cov[i])
-            data = self.df[['ra', 'dec']].copy()
+                    self.truth.loc[i, ['parallax', 'pmra', 'pmdec']], cov[i])
+            data = self.truth[['ra', 'dec']].copy()
             # TODO: not sure if this is the best way
             def cov_to_corr(cc):
                 d = np.sqrt(np.linalg.inv(np.diag(np.diag(cc))))
@@ -274,7 +276,7 @@ class ClusterMembers(object):
                 pmra_error=np.sqrt(cov[:,1,1]),
                 pmdec_error=np.sqrt(cov[:,2,2])
             )
-            self.data = data
+            self.observed = data
         else:
             irand = np.random.randint(0, high=len(error_from), size=self.N)
             cov = cov_from_gaia_table(error_from.loc[irand])
