@@ -70,6 +70,10 @@ class Cluster(object):
         # TODO option to accept astropy Quantities for parameters
         v0 = np.atleast_1d(v0)
         assert v0.shape == (3,), "v0 has a wrong shape"
+        # If there are any first-order terms, the center should be
+        # defined.
+        if any((omegas, ws, k)) and (b0 is None):
+            raise ValueError("'b0' should be given when any first-order term is non-zero.")
         if b0 is not None:
             b0 = np.atleast_1d(b0)
             assert b0.shape == (3,), "b0 has a wrong shape"
