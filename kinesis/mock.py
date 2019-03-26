@@ -44,6 +44,10 @@ class Cluster(object):
         """
         Make a cluster with mean velocity `v0` and dispersion `sigma`
 
+        All length units are assumed to be pc.
+        All velocity units are assumed to be km/s.
+        All angular frequency units are in km/s/kpc = m/s/pc.
+
         v0 : array-like, (3,)
             Mean velocity vector in km/s
         sigmav : float
@@ -153,7 +157,7 @@ class Cluster(object):
         if self.b0 is not None:
             bi -= self.b0[:, None]
         ui = self.v0 + np.random.normal([0, 0, 0], scale=self.sigmav, size=(N, 3))
-        ui += np.einsum('ij,jN->Ni', self.T, bi)
+        ui += np.einsum('ij,jN->Ni', self.T, bi) / 1e3
         coordinates = coord.ICRS(
             *icrs.cartesian.xyz,
             v_x=ui.T[0]*u.km/u.s, v_y=ui.T[1]*u.km/u.s, v_z=ui.T[2]*u.km/u.s,
