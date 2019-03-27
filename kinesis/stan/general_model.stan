@@ -1,4 +1,9 @@
+// A model of cluster proper motions including linear velocity field
+//
+// NOTE: See https://dev.to/martinmodrak/optional-parametersdata-in-stan-4o33
+//       for a trick to handle optional inputs in stan
 // TODO: clean up and make note of units
+// TODO: priors?
 data {
   int<lower=2> N;       // number of stars
   int<lower=0> Nrv;     // number of stars with RVs
