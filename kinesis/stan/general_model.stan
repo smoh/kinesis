@@ -121,3 +121,7 @@ model {
       rv[i] ~ normal(rv_model[i], sqrt(sigv^2 + (rv_error[i])^2));
     }
 }
+
+generated quantities {
+
+}

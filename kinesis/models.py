@@ -37,3 +37,11 @@ def get_model(model_name, recompile=False):
         logger.info('Reading model from disk')
         model = pickle.load(open(cache_file, 'rb'))
     return model
+
+
+class ClusterFit(object):
+    """class to facilitate cluster fitting"""
+    def __init__(self):
+        pass
+
+
