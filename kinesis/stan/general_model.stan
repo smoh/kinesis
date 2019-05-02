@@ -60,7 +60,7 @@ parameters {
   vector[3] v0;             // mean velocity  [km/s]
   real<lower=0> sigv;       // dispersion     [km/s]
 
-  matrix[3, 3] T[include_T ? 1 : 0];
+  matrix[3, 3] T[include_T ? 1 : 0];    // km/s/kpc = m/s/pc
 }
 
 // transformed parameters are stored, too.
@@ -86,8 +86,8 @@ transformed parameters {
 
   for(i in 1:N) {
     a_model[i][1] = 1000./d[i];
-    a_model[i][2] = M[i,1] * (v0 + T_param*(b[i] - b0)) / (d[i]/1000.) / 4.74;
-    a_model[i][3] = M[i,2] * (v0 + T_param*(b[i] - b0)) / (d[i]/1000.) / 4.74;
+    a_model[i][2] = M[i,1] * (v0 + T_param/1000.*(b[i] - b0)) / (d[i]/1000.) / 4.74;
+    a_model[i][3] = M[i,2] * (v0 + T_param/1000.*(b[i] - b0)) / (d[i]/1000.) / 4.74;
   }
 
   if (Nrv > 0) {
@@ -107,8 +107,10 @@ model {
   // likelihood
   for(i in 1:N) {
     D[i] = C[i];
-    D[i,2,2] += sigv^2 / (d[i]/1000.)^2 / 4.74^2;
-    D[i,3,3] += sigv^2 / (d[i]/1000.)^2 / 4.74^2;
+    // D[i,2,2] += sigv^2 / (d[i]/1000.)^2 / 4.74^2;
+    // D[i,3,3] += sigv^2 / (d[i]/1000.)^2 / 4.74^2;
+    D[i,2,2] = D[i,2,2] + sigv^2 / (d[i]/1000.)^2 / 4.74^2;
+    D[i,3,3] = D[i,3,3] + sigv^2 / (d[i]/1000.)^2 / 4.74^2;
     // print(i, D[i])
   }
 
@@ -120,8 +122,4 @@ model {
     for(i in 1:Nrv) {
       rv[i] ~ normal(rv_model[i], sqrt(sigv^2 + (rv_error[i])^2));
     }
-}
-
-generated quantities {
-
 }
