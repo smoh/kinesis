@@ -92,7 +92,7 @@ transformed parameters {
 
   if (Nrv > 0) {
     for(i in 1:Nrv) {
-      rv_model[i] = M[irv[i]+1, 3] * v0;
+      rv_model[i] = M[irv[i]+1, 3] * (v0 + T_param/1000.*(b[i] - b0));
     }
   }
 }
