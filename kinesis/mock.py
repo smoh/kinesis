@@ -11,7 +11,7 @@ import astropy.units as u
 
 from .utils import cov_from_gaia_table
 
-__all__ = ['sample_uniform_sphere', 'Cluster']
+__all__ = ["sample_uniform_sphere", "Cluster"]
 
 
 def sample_uniform_sphere(x0=None, Rmax=1, N=1, return_icrs=False):
@@ -28,18 +28,19 @@ def sample_uniform_sphere(x0=None, Rmax=1, N=1, return_icrs=False):
     """
     rhat = np.random.normal(size=(3, N))
     rhat /= np.linalg.norm(rhat, axis=0)
-    xyz = np.random.uniform(size=(1, N))**(1./3.) * Rmax * rhat
+    xyz = np.random.uniform(size=(1, N)) ** (1.0 / 3.0) * Rmax * rhat
     if x0 is not None:
         x0 = np.atleast_1d(x0)
         assert x0.shape == (3,), "`x0` has a wrong shape"
         xyz = xyz + x0[:, None]
     if return_icrs:
-        return coord.ICRS(*xyz*u.pc, representation_type='cartesian')
+        return coord.ICRS(*xyz * u.pc, representation_type="cartesian")
     return xyz
 
 
 class Cluster(object):
     """class representing a mock star cluster"""
+
     def __init__(self, v0, sigmav, omegas=None, ws=None, k=0, b0=None):
         """
         Make a cluster with mean velocity `v0` and dispersion `sigma`
@@ -73,7 +74,9 @@ class Cluster(object):
         # If there are any first-order terms, the center should be
         # defined.
         if any((omegas, ws, k)) and (b0 is None):
-            raise ValueError("'b0' should be given when any first-order term is non-zero.")
+            raise ValueError(
+                "'b0' should be given when any first-order term is non-zero."
+            )
         if b0 is not None:
             b0 = np.atleast_1d(b0)
             assert b0.shape == (3,), "b0 has a wrong shape"
@@ -96,9 +99,13 @@ class Cluster(object):
 
         # construct tensor T from omegas, ws and k
         # velocity field at b is v(b) = v0 + T(b-b0)
-        T = np.array([[ws[3], ws[2]-omegas[2], ws[1]+omegas[1]],
-                      [ws[2]+omegas[2], ws[4], ws[0]-omegas[0]],
-                      [ws[1]-omegas[1], ws[0]+omegas[0], 3*k-ws[3]-ws[4]]])
+        T = np.array(
+            [
+                [ws[3], ws[2] - omegas[2], ws[1] + omegas[1]],
+                [ws[2] + omegas[2], ws[4], ws[0] - omegas[0]],
+                [ws[1] - omegas[1], ws[0] + omegas[0], 3 * k - ws[3] - ws[4]],
+            ]
+        )
         self.T = T
         self.members = None
 
@@ -123,8 +130,8 @@ class Cluster(object):
             raise ValueError("`coord` must be a single cluster coordinate.")
         cluster_coord = cluster_coord.transform_to(coord.ICRS)
 
-        b0 = cluster_coord.cartesian.xyz.to('pc').value
-        v0 = cluster_coord.cartesian.differentials['s'].d_xyz.to(u.km/u.s).value
+        b0 = cluster_coord.cartesian.xyz.to("pc").value
+        v0 = cluster_coord.cartesian.differentials["s"].d_xyz.to(u.km / u.s).value
         return cls(b0, v0, sigmav, omegas=omegas, ws=ws)
 
     def sample_sphere(self, N=1, Rmax=10):
@@ -139,7 +146,7 @@ class Cluster(object):
         Returns self with `members` attribute populated.
         """
         if self.members:
-            raise AttributeError('The cluster already have members.')
+            raise AttributeError("The cluster already have members.")
         xyz_coords = sample_uniform_sphere(x0=self.b0, Rmax=Rmax, N=N, return_icrs=True)
         return self.sample_at(xyz_coords)
 
@@ -161,12 +168,15 @@ class Cluster(object):
         if self.b0 is not None:
             bi -= self.b0[:, None]
         ui = self.v0 + np.random.normal([0, 0, 0], scale=self.sigmav, size=(N, 3))
-        ui += np.einsum('ij,jN->Ni', self.T, bi) / 1e3
+        ui += np.einsum("ij,jN->Ni", self.T, bi) / 1e3
         coordinates = coord.ICRS(
             *icrs.cartesian.xyz,
-            v_x=ui.T[0]*u.km/u.s, v_y=ui.T[1]*u.km/u.s, v_z=ui.T[2]*u.km/u.s,
-            representation_type='cartesian',
-            differential_type='cartesian')
+            v_x=ui.T[0] * u.km / u.s,
+            v_y=ui.T[1] * u.km / u.s,
+            v_z=ui.T[2] * u.km / u.s,
+            representation_type="cartesian",
+            differential_type="cartesian"
+        )
         self.members = ClusterMembers(coordinates)
         return self
 
@@ -209,7 +219,7 @@ class ClusterMembers(object):
         data : pandas.DataFrame
             simulated data with noise with Gaia-like columns
         """
-        if hasattr(coordinates, 'differentials'):
+        if hasattr(coordinates, "differentials"):
             raise ValueError("`coordinates` should have differentials")
         self.N = len(coordinates)
 
@@ -217,26 +227,32 @@ class ClusterMembers(object):
         assert coordinates.differential_type == coord.CartesianDifferential
         sph = coordinates.spherical
         # make a Gaia DataFrame
-        df = pd.DataFrame({
-            'ra': sph.lon.deg,
-            'dec': sph.lat.deg,
-            'parallax': 1/sph.distance.to(u.kpc).value,
-            # NOTE: `d_lon` should be multiplied by cos(`lat`)!
-            'pmra': sph.differentials['s'].d_lon.to(u.mas/u.yr).value * np.cos(sph.lat.rad),
-            'pmdec': sph.differentials['s'].d_lat.to(u.mas/u.yr).value,
-            'radial_velocity': sph.differentials['s'].d_distance.to(u.km/u.s).value
-        })
+        df = pd.DataFrame(
+            {
+                "ra": sph.lon.deg,
+                "dec": sph.lat.deg,
+                "parallax": 1 / sph.distance.to(u.kpc).value,
+                # NOTE: `d_lon` should be multiplied by cos(`lat`)!
+                "pmra": sph.differentials["s"].d_lon.to(u.mas / u.yr).value
+                * np.cos(sph.lat.rad),
+                "pmdec": sph.differentials["s"].d_lat.to(u.mas / u.yr).value,
+                "radial_velocity": sph.differentials["s"]
+                .d_distance.to(u.km / u.s)
+                .value,
+            }
+        )
         self.truth = df
         self.observed = None
 
         # To have natural attributes of ICRS, make it again with spherical
         # representation
         self.icrs = coord.ICRS(
-            df.ra.values*u.deg, df.dec.values*u.deg,
-            distance=1e3*u.pc/df.parallax.values,
-            pm_ra_cosdec=df.pmra.values*u.mas/u.yr,
-            pm_dec=df.pmdec.values*u.mas/u.yr,
-            radial_velocity=df.radial_velocity.values*u.km/u.s
+            df.ra.values * u.deg,
+            df.dec.values * u.deg,
+            distance=1e3 * u.pc / df.parallax.values,
+            pm_ra_cosdec=df.pmra.values * u.mas / u.yr,
+            pm_dec=df.pmdec.values * u.mas / u.yr,
+            radial_velocity=df.radial_velocity.values * u.km / u.s,
         )
 
     def observe(self, cov=None, error_from=None):
@@ -264,25 +280,28 @@ class ClusterMembers(object):
             a_data = np.zeros((self.N, 3))
             for i in range(self.N):
                 a_data[i] = np.random.multivariate_normal(
-                    self.truth.loc[i, ['parallax', 'pmra', 'pmdec']], cov[i])
-            data = self.truth[['ra', 'dec']].copy()
+                    self.truth.loc[i, ["parallax", "pmra", "pmdec"]], cov[i]
+                )
+            data = self.truth[["ra", "dec"]].copy()
             # TODO: not sure if this is the best way
             def cov_to_corr(cc):
                 d = np.sqrt(np.linalg.inv(np.diag(np.diag(cc))))
                 corr = d.dot(cc).dot(d)
-                return corr[np.triu_indices(3,1)]
-            parallax_pmra_corr, parallax_pmdec_corr, pmra_pmdec_corr = \
-                np.vstack(list(map(cov_to_corr, cov))).T
+                return corr[np.triu_indices(3, 1)]
+
+            parallax_pmra_corr, parallax_pmdec_corr, pmra_pmdec_corr = np.vstack(
+                list(map(cov_to_corr, cov))
+            ).T
             data = data.assign(
-                parallax=a_data[:,0],
-                pmra=a_data[:,1],
-                pmdec=a_data[:,2],
+                parallax=a_data[:, 0],
+                pmra=a_data[:, 1],
+                pmdec=a_data[:, 2],
                 parallax_pmra_corr=parallax_pmra_corr,
                 parallax_pmdec_corr=parallax_pmdec_corr,
                 pmra_pmdec_corr=pmra_pmdec_corr,
-                parallax_error=np.sqrt(cov[:,0,0]),
-                pmra_error=np.sqrt(cov[:,1,1]),
-                pmdec_error=np.sqrt(cov[:,2,2])
+                parallax_error=np.sqrt(cov[:, 0, 0]),
+                pmra_error=np.sqrt(cov[:, 1, 1]),
+                pmdec_error=np.sqrt(cov[:, 2, 2]),
             )
             self.observed = data
         else:
