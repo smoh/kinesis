@@ -42,7 +42,20 @@ def get_model(model_name, recompile=False):
 
 
 class Fitter(object):
-    """class to facilitate cluster fitting"""
+    """class to facilitate cluster fitting
+    
+    include_T : bool
+        True to include linear velocity gradient in the model.
+    recompile : bool
+        True to force recompilation of the stan model.
+    
+    Attributes
+    ----------
+    include_T : bool
+        True if linear velocity gradient is included in the model.
+    model : pystan.StanModel
+        compiled stan model
+    """
 
     def __init__(self, include_T=True, recompile=False):
         self.include_T = include_T
@@ -54,6 +67,18 @@ class Fitter(object):
             self._pars += ["T_param"]
 
     def validate_dataframe(self, df):
+        """Validate that the dataframe has required columns
+        
+        Parameters
+        ----------
+        df : pandas.DataFrame
+            data
+        
+        Raises
+        ------
+        ValueError
+            if any column is missing.
+        """
         required_columns = [
             "ra",
             "dec",
@@ -75,7 +100,26 @@ class Fitter(object):
                 if col not in df:
                     raise ValueError(f"`include_T` is True but df is missing {col}")
 
-    def fit(self, df, sample=True, **kwargs):
+    def fit(self, df, sample=True, b0=None, **kwargs):
+        """Fit model to the given data
+        
+        Parameters
+        ----------
+        df : pandas.DataFrame
+            astrometry + RV data with Gaia-like column names
+        sample : bool, optional
+            draw mcmc samples, by default True
+            If False, this will do opimization.
+        b0 : np.array
+            [x, y, z] defining cluster center
+            If include_T is True, b0 must be specified.
+        
+        Returns
+        -------
+        OrderedDict or pystan.StanFit4Model
+            If sample is False, the return type is OrderedDict from pystan.StanModel.optimizing.
+        """
+
         if "data" in kwargs:
             raise ValueError("`data` should be specified as pandas.DataFrame.")
         self.validate_dataframe(df)
@@ -106,12 +150,10 @@ class Fitter(object):
         # b0_default = np.median(df.g.icrs.cartesian.xyz.value, axis=1)
         # b0 = kwargs.pop("b0", b0_default)
         # data["b0"] = b0
-        if self.include_T:
-            if "b0" not in kwargs:
+        if b0 is None:
+            if self.include_T:
                 raise ValueError("`b0` must be given if include_T=True")
-            b0 = kwargs.pop("b0")
-        else:
-            b0 = kwargs.pop("b0", np.array([0.0, 0.0, 0.0]))  # this does not matter
+            b0 = np.array([0.0, 0.0, 0.0])  # this does not matter
         data["b0"] = b0
 
         # TODO: init with MAP
