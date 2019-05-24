@@ -92,7 +92,7 @@ transformed parameters {
 
   if (Nrv > 0) {
     for(i in 1:Nrv) {
-      rv_model[i] = M[irv[i]+1, 3] * (v0 + T_param/1000.*(b[i] - b0));
+      rv_model[i] = M[irv[i]+1, 3] * (v0 + T_param/1000.*(b[irv[i]+1] - b0));
     }
   }
 }
@@ -123,3 +123,21 @@ model {
       rv[i] ~ normal(rv_model[i], sqrt(sigv^2 + (rv_error[i])^2));
     }
 }
+
+// generated quantities {
+//   vector[3] a_hat[N];
+//   real rv_hat[Nrv];
+
+//   for(i in 1:N) {
+//     // matrix[3, 3] D_tmp;
+//     // D_tmp = C[i];
+//     // D_tmp[2,2] = D_tmp[2,2] + sigv^2 / (d[i]/1000.)^2 / 4.74^2;
+//     // D_tmp[3,3] = D_tmp[3,3] + sigv^2 / (d[i]/1000.)^2 / 4.74^2;
+//     a_hat[i] = multi_normal_rng(a_model[i], C[i]);
+//   }
+//   if (Nrv > 0) {
+//     for(i in 1:Nrv) {
+//       rv_hat[i] = normal_rng(rv_model[i], rv_error[i]);
+//     }
+//   }
+// }
