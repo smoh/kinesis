@@ -1,5 +1,6 @@
 .tags*
 *.ipynb
+dask-worker-space
 
 ### https://raw.github.com/github/gitignore/45dca6a85905883a6459208e249822068f652ac3/TeX.gitignore
 
