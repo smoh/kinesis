@@ -43,12 +43,12 @@ def get_model(model_name, recompile=False):
 
 class Fitter(object):
     """class to facilitate cluster fitting
-    
+
     include_T : bool
         True to include linear velocity gradient in the model.
     recompile : bool
         True to force recompilation of the stan model.
-    
+
     Attributes
     ----------
     include_T : bool
@@ -68,12 +68,12 @@ class Fitter(object):
 
     def validate_dataframe(self, df):
         """Validate that the dataframe has required columns
-        
+
         Parameters
         ----------
         df : pandas.DataFrame
             data
-        
+
         Raises
         ------
         ValueError
@@ -102,7 +102,7 @@ class Fitter(object):
 
     def fit(self, df, sample=True, b0=None, **kwargs):
         """Fit model to the given data
-        
+
         Parameters
         ----------
         df : pandas.DataFrame
@@ -113,7 +113,10 @@ class Fitter(object):
         b0 : np.array
             [x, y, z] defining cluster center
             If include_T is True, b0 must be specified.
-        
+        **kwargs
+            Additional keyword arguments are passed to
+            pystan.StanModel.optimizing or pystan.StanModel.sampling.
+
         Returns
         -------
         OrderedDict or pystan.StanFit4Model
@@ -157,7 +160,7 @@ class Fitter(object):
         data["b0"] = b0
 
         # TODO: init with MAP
-        def stan_init():
+        def init_func():
             return dict(
                 d=1e3 / df["parallax"].values,
                 sigv=1.5,
@@ -165,8 +168,10 @@ class Fitter(object):
                 T=np.zeros(shape=(int(self.include_T), 3, 3)),
             )
 
+        init = kwargs.pop('init', init_func)
+
         if sample:
             pars = kwargs.pop("pars", self._pars)
-            return self.model.sampling(data=data, init=stan_init, pars=pars, **kwargs)
+            return self.model.sampling(data=data, init=init, pars=pars, **kwargs)
         else:
-            return self.model.optimizing(data=data, init=stan_init, **kwargs)
+            return self.model.optimizing(data=data, init=init, **kwargs)
