@@ -61,6 +61,9 @@ parameters {
   real<lower=0> sigv;       // dispersion     [km/s]
 
   matrix[3, 3] T[include_T ? 1 : 0];    // km/s/kpc = m/s/pc
+
+  // real rv_offset;
+  // real<lower=0> rv_extra_dispersion;
 }
 
 // transformed parameters are stored, too.
@@ -120,6 +123,7 @@ model {
 
   if(Nrv > 0)
     for(i in 1:Nrv) {
+      // rv[i] ~ normal(rv_model[i], sqrt(sigv^2 + (rv_error[i])^2 + rv_extra_dispersion^2));
       rv[i] ~ normal(rv_model[i], sqrt(sigv^2 + (rv_error[i])^2));
     }
 }

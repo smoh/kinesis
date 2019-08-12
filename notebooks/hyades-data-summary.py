@@ -49,6 +49,12 @@ gdr2 = df.groupby('in_dr2').get_group(True)
 df[["in_dr2", "in_leao", "in_meingast", "in_roser"]].fillna(False).groupby(["in_dr2"]).sum()
 
 # %%
+df[["in_dr2", "in_leao", "in_meingast", "in_roser"]].fillna(False).groupby('in_dr2').get_group(False).groupby('in_meingast').sum()
+
+# %%
+df[["in_dr2", "in_leao", "in_meingast", "in_roser"]].fillna(False).groupby('in_dr2').get_group(False).groupby('in_roser').sum()
+
+# %%
 fig, ax = plt.subplots(1, 1, figsize=(4, 2.5), subplot_kw=dict(projection=ccrs.Mollweide()))
 ax.gridlines(
     crs=ccrs.Geodetic(),

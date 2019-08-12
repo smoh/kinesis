@@ -62,7 +62,14 @@ class Fitter(object):
         self.model = get_model("general_model", recompile=recompile)
 
         # default parameters to query
-        self._pars = ["v0", "sigv", "a_model", "rv_model"]
+        self._pars = [
+            "v0",
+            "sigv",
+            "a_model",
+            "rv_model",
+            # "rv_offset",
+            # "rv_extra_dispersion",
+        ]
         if include_T:
             self._pars += ["T_param"]
 
@@ -166,6 +173,8 @@ class Fitter(object):
                 sigv=1.5,
                 v0=np.random.normal(scale=50, size=3),
                 T=np.zeros(shape=(int(self.include_T), 3, 3)),
+                # rv_offset=0.0,
+                # rv_extra_dispersion=0.1,
             )
 
         init = kwargs.pop('init', init_func)
@@ -175,3 +184,64 @@ class Fitter(object):
             return self.model.sampling(data=data, init=init, pars=pars, **kwargs)
         else:
             return self.model.optimizing(data=data, init=init, **kwargs)
+
+    @staticmethod
+    def calculate_rv_residual(stanfit):
+        """Calculate (rv_data - rv_model) / sqrt(rv_error^2 + sigv_model^2)
+
+        Returns
+        -------
+        res : 2d-array of (n_posterior_samples, n_rv_sources).
+
+        Sliced in axis=0, they should be distributed as Normal(0, 1).
+        """
+        res = (stanfit.data["rv"][None, :] - stanfit["rv_model"]) / np.hypot(
+            stanfit.data["rv_error"][None, :], stanfit["sigv"][:, None]
+        )
+        return res
+
+    @staticmethod
+    def calculate_veca_residual(stanfit):
+        """Calculate (a_data - a_model)^T * D * (a_data - a_model)
+
+        where D is covariance matrix of observed errors + sigv.
+
+        Returns
+        -------
+        g : 2d array, (n_samples, n_sources)
+        
+        Sliced in axis=0, they should be distributed as chi2(df=3).
+        """
+        fit = stanfit
+        n_samples = fit["sigv"].shape[0]
+        delta_a = fit.data["a"][None, :] - fit["a_model"]
+        D = np.repeat(fit.data["C"].copy()[None], n_samples, axis=0)
+        D[:, :, 1, 1] += (fit["sigv"] ** 2)[:, None] / (fit["d"] / 1e3) ** 2 / 4.74 ** 2
+        D[:, :, 2, 2] += (fit["sigv"] ** 2)[:, None] / (fit["d"] / 1e3) ** 2 / 4.74 ** 2
+        Dinv = np.linalg.inv(D)
+        g = np.einsum("sni,snij,snj->sn", delta_a, Dinv, delta_a)
+        return g
+
+    @staticmethod
+    def plot_ppc_rv(stanfit):
+        import seaborn as sns
+        import matplotlib.pyplot as plt
+        import scipy as sp
+
+        rv_res = Fitter.calculate_rv_residual(stanfit)
+        for slc in rv_res:
+            sns.distplot(slc, hist=False, kde_kws={"lw": 0.5})
+        x = np.linspace(-5, 5, 51)
+        plt.plot(x, sp.stats.norm.pdf(x), "k-")
+        return plt.gcf()
+
+
+#     @staticmethod
+#     def plot_ppc_veca(stanfit):
+#         g = Fitter.calculate_veca_residual(stanfit)
+#         for i in range(500):
+#     sns.distplot(g[:,i], hist=False, kde_kws={'lw':.5, 'color':'k'});
+# x=np.linspace(0,10,101)
+# pdfx= sp.stats.chi2(df=3).pdf(x)
+# plt.plot(x, pdfx)
+# sns.distplot(g[:,187], hist=False, kde_kws={'lw':2});
