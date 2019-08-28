@@ -12,4 +12,4 @@ jobs:
       source activate kinesis
       cd $(Build.SourcesDirectory)
       pip install -e .
-      displayName: Install dependencies
+    displayName: Install dependencies
