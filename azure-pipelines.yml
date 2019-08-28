@@ -11,13 +11,14 @@ jobs:
   - bash: |
       source activate kinesis
       # may include this to setup.py in the end
-      pip install numpy pandas
+      pip install pandas
       pip install git+https://github.com/smoh/gapipes.git@master
       cd $(Build.SourcesDirectory)
       pip install -e .
       pip freeze | grep -E "astropy|kinesis|pystan|arviz"
     displayName: Install dependencies
   - bash: |
+      source activate kinesis
       pip install pytest
       pytest .
     displayName: Run tests
