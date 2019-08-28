@@ -10,6 +10,9 @@ jobs:
     displayName: Create Anaconda environment
   - bash: |
       source activate kinesis
+      # may include this to setup.py in the end
+      pip install numpy pandas
+      pip install git+https://github.com/smoh/gapipes.git@master
       cd $(Build.SourcesDirectory)
       pip install -e .
       pip freeze | grep -E "astropy|kinesis|pystan|arviz"

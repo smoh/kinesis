@@ -14,6 +14,6 @@ setup(
     author=AUTHOR,
     author_email=EMAIL,
     packages=find_packages(exclude=("tests",)),
-    package_data={'kinesis': ['stan/*.stan']},
+    package_data={"kinesis": ["stan/*.stan"]},
     install_requires=["astropy", "arviz", "pystan"],
 )
