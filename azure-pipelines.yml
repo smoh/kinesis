@@ -8,3 +8,8 @@ jobs:
     displayName: Add conda to PATH
   - bash: conda create --yes --quiet --name kinesis python=3.7 pip
     displayName: Create Anaconda environment
+  - bash: |
+      conda activate kinesis
+      cd $(Build.SourcesDirectory)
+      pip install -e .
+      displayName: Install dependencies
