@@ -12,4 +12,9 @@ jobs:
       source activate kinesis
       cd $(Build.SourcesDirectory)
       pip install -e .
+      pip freeze | grep -E "astropy|kinesis|pystan|arviz"
     displayName: Install dependencies
+  - bash: |
+      pip install pytest
+      pytest .
+    displayName: Run tests
