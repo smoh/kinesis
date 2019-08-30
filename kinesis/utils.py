@@ -4,7 +4,13 @@ from functools import wraps
 import numpy as np
 import pandas as pd
 
-__all__ = ["save_stanfit", "load_stanfit", "cache_to", "cov_from_gaia_table"]
+__all__ = [
+    "save_stanfit",
+    "load_stanfit",
+    "cov_from_gaia_table",
+    "decompose_T",
+    "rotate_T_to_galactic",
+]
 
 
 def save_stanfit(stanfit, outfile):
