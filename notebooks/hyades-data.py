@@ -85,7 +85,7 @@ JOIN gaiadr2.hipparcos2_best_neighbour AS xm
 JOIN gaiadr2.gaia_source AS gaia
   ON xm.source_id = gaia.source_id
 """
-leaox = gp.gaia.query(query_leao_sourceid, upload_table_name="t", upload_resource=t[["ID", "HIP"]])[
+leaox = gp.gaia.query(query_leao_sourceid, upload_table_name="t", upload_resource=leao[["ID", "HIP"]])[
     ["source_id", "hip"]
 ]
 leaox["in_leao"] = True
@@ -157,3 +157,6 @@ print(f"{len(out_full)} rows in the combined catalog")
 
 # %%
 print(out_full[['in_dr2', 'in_leao', 'in_meingast', 'in_roser']].count())
+
+# %%
+out_full.to_csv("../data/hyades_full.csv", index=False)
