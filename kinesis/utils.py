@@ -29,31 +29,56 @@ def load_stanfit(filename):
     return fit
 
 
-def decompose(parameter_list):
-    pass
+def decompose_T(T):
+    """Decompose velocity gradient tensor to interpretable components
 
-
-def cache_to(path):
+    T : array, (3, 3) or (N, 3, 3)
+        dv_j / dv_i
+    
     """
-    Decorator to cache pandas DataFrame to csv
-    """
+    if T.ndim == 2:
+        T = T[None]
+    if T.shape[1:] != (3, 3):
+        raise ValueError("`T` must have shape (3, 3) or (N, 3, 3)")
+    omegax = 0.5 * (T[:, 2, 1] - T[:, 1, 2])
+    omegay = 0.5 * (T[:, 0, 2] - T[:, 2, 0])
+    omegaz = 0.5 * (T[:, 1, 0] - T[:, 0, 1])
 
-    def decorator_cache(func):
-        @wraps(func)
-        def wrapper_cache():
-            try:
-                r = pd.read_csv(path)
-                print("Data loaded from {:s}".format(path))
-                return r
-            except FileNotFoundError:
-                r = func()
-                r.to_csv(path)
-                print("Data written to {:s}".format(path))
-                return r
+    w1 = 0.5 * (T[:, 2, 1] + T[:, 1, 2])
+    w2 = 0.5 * (T[:, 0, 2] + T[:, 2, 0])
+    w3 = 0.5 * (T[:, 1, 0] + T[:, 0, 1])
+    w4 = T[:, 0, 0]
+    w5 = T[:, 1, 1]
+    kappa = (w4 + w5 + T[:, 2, 2]) / 3.0
+    T = T.squeeze()
+    return dict(
+        omegax=omegax,
+        omegay=omegay,
+        omegaz=omegaz,
+        w1=w1,
+        w2=w2,
+        w3=w3,
+        w4=w4,
+        w5=w5,
+        kappa=kappa,
+    )
 
-        return wrapper_cache
 
-    return decorator_cache
+def rotate_T_to_galactic(T):
+    """R T R^T"""
+    # hack rotation matrix from icrs -> galactic
+    rotmat = (
+        coord.ICRS(
+            [1, 0, 0],
+            [0, 1, 0],
+            [0, 0, 1],
+            representation_type=coord.CartesianRepresentation,
+        )
+        .transform_to(coord.Galactic)
+        .cartesian.xyz.value
+    )
+    rotated_T = np.einsum("ij,njk,kl->nil", rotmat, T, rotmat.T)
+    return rotated_T
 
 
 def cov_from_gaia_table(df):
