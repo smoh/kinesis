@@ -61,9 +61,6 @@ parameters {
   real<lower=0> sigv;       // dispersion     [km/s]
 
   matrix[3, 3] T[include_T ? 1 : 0];    // km/s/kpc = m/s/pc
-
-  // real rv_offset;
-  // real<lower=0> rv_extra_dispersion;
 }
 
 // transformed parameters are stored, too.
@@ -71,7 +68,6 @@ transformed parameters {
   vector[3] a_model[N];
   real rv_model[Nrv];
   vector[3] b[N];
-  matrix[3,3] D[N];       // modified covariance matrix
 
   matrix[3, 3] T_param;
   if (include_T) {
@@ -94,12 +90,6 @@ transformed parameters {
     a_model[i][3] = M[i,2] * (v0 + T_param/1000.*(b[i] - b0)) / (d[i]/1000.) / 4.74;
   }
 
-  for(i in 1:N) {
-    D[i] = C[i];
-    D[i,2,2] = D[i,2,2] + sigv^2 / (d[i]/1000.)^2 / 4.74^2;
-    D[i,3,3] = D[i,3,3] + sigv^2 / (d[i]/1000.)^2 / 4.74^2;
-  }
-
   if (Nrv > 0) {
     for(i in 1:Nrv) {
       rv_model[i] = M[irv[i]+1, 3] * (v0 + T_param/1000.*(b[irv[i]+1] - b0));
@@ -108,37 +98,46 @@ transformed parameters {
 }
 
 model {
+  matrix[3,3] D[N];       // modified covariance matrix
+
 
   // v0 ~ normal(0, 100);
   // sigv ~ normal(0, 10);
 
   // likelihood
   for(i in 1:N) {
+    D[i] = C[i];
+    // D[i,2,2] += sigv^2 / (d[i]/1000.)^2 / 4.74^2;
+    // D[i,3,3] += sigv^2 / (d[i]/1000.)^2 / 4.74^2;
+    D[i,2,2] = D[i,2,2] + sigv^2 / (d[i]/1000.)^2 / 4.74^2;
+    D[i,3,3] = D[i,3,3] + sigv^2 / (d[i]/1000.)^2 / 4.74^2;
+    // print(i, D[i])
+  }
+
+  for(i in 1:N) {
     a[i] ~ multi_normal(a_model[i], D[i]);
   }
 
   if(Nrv > 0)
     for(i in 1:Nrv) {
-      // rv[i] ~ normal(rv_model[i], sqrt(sigv^2 + (rv_error[i])^2 + rv_extra_dispersion^2));
       rv[i] ~ normal(rv_model[i], sqrt(sigv^2 + (rv_error[i])^2));
     }
 }
 
-generated quantities {
-  vector[3] a_hat[N];
-  real log_lik_a[N];
-  real rv_hat[Nrv];
-  real log_lik_rv[Nrv];
+// generated quantities {
+//   vector[3] a_hat[N];
+//   real rv_hat[Nrv];
 
-
-  for(i in 1:N) {
-    a_hat[i] = multi_normal_rng(a_model[i], D[i]);
-    log_lik_a[i] = multi_normal_lpdf(a[i] | a_model[i], D[i]);
-  }
-  if (Nrv > 0) {
-    for(i in 1:Nrv) {
-      rv_hat[i] = normal_rng(rv_model[i], sqrt(sigv^2 + (rv_error[i])^2));
-      log_lik_rv[i] = normal_lpdf(rv[i] | rv_model[i], sqrt(sigv^2 + (rv_error[i])^2));
-    }
-  }
-}
+//   for(i in 1:N) {
+//     // matrix[3, 3] D_tmp;
+//     // D_tmp = C[i];
+//     // D_tmp[2,2] = D_tmp[2,2] + sigv^2 / (d[i]/1000.)^2 / 4.74^2;
+//     // D_tmp[3,3] = D_tmp[3,3] + sigv^2 / (d[i]/1000.)^2 / 4.74^2;
+//     a_hat[i] = multi_normal_rng(a_model[i], C[i]);
+//   }
+//   if (Nrv > 0) {
+//     for(i in 1:Nrv) {
+//       rv_hat[i] = normal_rng(rv_model[i], rv_error[i]);
+//     }
+//   }
+// }
