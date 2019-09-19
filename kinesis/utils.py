@@ -3,6 +3,7 @@ from functools import wraps
 
 import numpy as np
 import pandas as pd
+import astropy.coordinates as coord
 
 __all__ = [
     "save_stanfit",
@@ -38,24 +39,27 @@ def load_stanfit(filename):
 def decompose_T(T):
     """Decompose velocity gradient tensor to interpretable components
 
-    T : array, (3, 3) or (N, 3, 3)
+    T : array, (..., 3, 3)
         dv_j / dv_i
     
-    """
-    if T.ndim == 2:
-        T = T[None]
-    if T.shape[1:] != (3, 3):
-        raise ValueError("`T` must have shape (3, 3) or (N, 3, 3)")
-    omegax = 0.5 * (T[:, 2, 1] - T[:, 1, 2])
-    omegay = 0.5 * (T[:, 0, 2] - T[:, 2, 0])
-    omegaz = 0.5 * (T[:, 1, 0] - T[:, 0, 1])
+    Returns
+    -------
+    dict
 
-    w1 = 0.5 * (T[:, 2, 1] + T[:, 1, 2])
-    w2 = 0.5 * (T[:, 0, 2] + T[:, 2, 0])
-    w3 = 0.5 * (T[:, 1, 0] + T[:, 0, 1])
-    w4 = T[:, 0, 0]
-    w5 = T[:, 1, 1]
-    kappa = (w4 + w5 + T[:, 2, 2]) / 3.0
+    
+    """
+    if T.shape[-2:] != (3, 3):
+        raise ValueError("`T` must have shape (..., 3, 3)")
+    omegax = 0.5 * (T[..., 2, 1] - T[..., 1, 2])
+    omegay = 0.5 * (T[..., 0, 2] - T[..., 2, 0])
+    omegaz = 0.5 * (T[..., 1, 0] - T[..., 0, 1])
+
+    w1 = 0.5 * (T[..., 2, 1] + T[..., 1, 2])
+    w2 = 0.5 * (T[..., 0, 2] + T[..., 2, 0])
+    w3 = 0.5 * (T[..., 1, 0] + T[..., 0, 1])
+    w4 = T[..., 0, 0]
+    w5 = T[..., 1, 1]
+    kappa = (w4 + w5 + T[..., 2, 2]) / 3.0
     T = T.squeeze()
     return dict(
         omegax=omegax,
