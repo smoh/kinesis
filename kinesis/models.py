@@ -3,12 +3,13 @@ import logging
 import pickle
 import numpy as np
 import pystan
+import arviz as az
 
 logger = logging.getLogger(__name__)
 
 ROOT = os.path.abspath(os.path.dirname(__file__))
 
-__all__ = ["get_model", "Fitter"]
+__all__ = ["get_model", "Fitter", "FitResult"]
 
 
 def model_path(model_name):
@@ -177,11 +178,12 @@ class Fitter(object):
                 # rv_extra_dispersion=0.1,
             )
 
-        init = kwargs.pop('init', init_func)
+        init = kwargs.pop("init", init_func)
 
         if sample:
             pars = kwargs.pop("pars", self._pars)
-            return self.model.sampling(data=data, init=init, pars=pars, **kwargs)
+            stanfit = self.model.sampling(data=data, init=init, pars=pars, **kwargs)
+            return FitResult(stanfit)
         else:
             return self.model.optimizing(data=data, init=init, **kwargs)
 
@@ -245,3 +247,48 @@ class Fitter(object):
 # pdfx= sp.stats.chi2(df=3).pdf(x)
 # plt.plot(x, pdfx)
 # sns.distplot(g[:,187], hist=False, kde_kws={'lw':2});
+
+
+class FitResult(object):
+    """Fit result object to facilitate converting and saving data structure
+
+    Attributes
+    ----------
+    stanfit : StanFit4Model object
+        stan fit result
+    azfit : arviz.InferenceData
+        fit result for arviz plotting
+    """
+
+    def __init__(self, stanfit):
+        self.stanfit = stanfit
+        self.azfit = FitResult.to_azfit(stanfit)
+
+    @staticmethod
+    def to_azfit(stanfit):
+        """Convert stanfit to arviz InferenceData"""
+        azkwargs = {
+            "coords": {"axis": ["x", "y", "z"]},
+            "dims": {
+                "v0": ["axis"],
+                "a_hat": ["star", "axis"],
+                "log_likelihood": ["star"],
+                "a": ["star", "axis"],
+            },
+            "observed_data": ["a", "rv"],
+        }
+        azfit = az.from_pystan(stanfit, **azkwargs)
+        return azfit
+
+    def save(self, filename):
+        stanfit = self.stanfit
+        model = stanfit.stanmodel
+        with open(filename, "wb") as f:
+            pickle.dump((model, stanfit), f, protocol=-1)
+
+    @classmethod
+    def from_pickle(self, filename):
+        with open(filename, "rb") as f:
+            model, stanfit = pickle.load(f)
+        self.stanfit = stanfit
+        self.azfit = FitResult.to_azfit(stanfit)
