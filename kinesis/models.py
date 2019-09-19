@@ -287,8 +287,7 @@ class FitResult(object):
             pickle.dump((model, stanfit), f, protocol=-1)
 
     @classmethod
-    def from_pickle(self, filename):
+    def from_pickle(cls, filename):
         with open(filename, "rb") as f:
             model, stanfit = pickle.load(f)
-        self.stanfit = stanfit
-        self.azfit = FitResult.to_azfit(stanfit)
+        return cls(stanfit)
