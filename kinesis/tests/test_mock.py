@@ -72,7 +72,6 @@ class TestCluster(object):
         cl = (
             mock.Cluster(v0, sigv).sample_sphere(N=N, Rmax=1).observe(cov=np.eye(3) * 4)
         )
-        print(cl.members.observed.columns.values)
         assert set(cl.members.observed.columns) == set(
             [
                 "ra",
