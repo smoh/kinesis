@@ -51,8 +51,11 @@ class Cluster(object):
 
         v0 : array-like, (3,)
             Mean velocity vector in km/s
-        sigmav : float
-            (Isotropic) velocity dispersion in km/s
+        sigmav : float, array-like
+            If float, interpreted as isotropic velocity dispersion.
+            If (3,) array, interpreted as (sigma_vx, sigma_vy, sigma_vz).
+            If (3,3) array, interpreted as the *covariance* matrix.
+            All in km/s.
         omegas : array-like, (3,), optional
             Angular frequencies of rotation around x, y, z axis
         ws : array-like, (5,), optional
@@ -67,6 +70,12 @@ class Cluster(object):
         ----------
         members : None or `ClusterMembers` instance
             Use sample_
+        b0 : array-like, [x, y, z]
+            center of cluster in pc
+        v0 : array-like, [vx, vy, vz]
+            mean velocity of cluster in km/s
+        sigmav : float, array-like
+            velocity dispersion
         """
         # TODO option to accept astropy Quantities for parameters
         v0 = np.atleast_1d(v0)
@@ -167,7 +176,8 @@ class Cluster(object):
         assert bi.shape == (3, N), "WTF"
         if self.b0 is not None:
             bi -= self.b0[:, None]
-        ui = self.v0 + np.random.normal([0, 0, 0], scale=self.sigmav, size=(N, 3))
+        # ui = self.v0 + np.random.normal([0, 0, 0], scale=self.sigmav, size=(N, 3))
+        ui = self.v0 + np.random.multivariate_normal([0, 0, 0], self.Sigma, size=(N,))
         ui += np.einsum("ij,jN->Ni", self.T, bi) / 1e3
         coordinates = coord.ICRS(
             *icrs.cartesian.xyz,
@@ -179,6 +189,18 @@ class Cluster(object):
         )
         self.members = ClusterMembers(coordinates)
         return self
+
+    @property
+    def Sigma(self):
+        """Convert dispersion to (3, 3) covariance matrix"""
+        if np.ndim(self.sigmav) == 0:
+            return self.sigmav ** 2 * np.eye(3)
+        elif np.shape(self.sigmav) == (3,):
+            return np.diag(self.sigmav) ** 2
+        elif np.shape(self.sigmav) == (3, 3):
+            return np.array(self.sigmav)
+        else:
+            raise ValueError("Could not parse sigmav.")
 
     @property
     def N(self):
