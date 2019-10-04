@@ -1,3 +1,4 @@
+mnras/
 .tags*
 *.ipynb
 dask-worker-space
