@@ -1,3 +1,11 @@
+// NOTE: this model should be equivalent to anisotropic_rv.stan,
+// but I tried the more straightforward way of having latent individual
+// velocities `vi`. 
+// The model as is does not work because `vi`, whether it is in `transformed_parameter`
+// or in `model` block, is never initialized, and although the model will compile,
+// it will error to having 'nan' in all initialization attempts.
+// TODO: I think the way is to put them in `paramters` block and initialize explicitly,
+// but moving on for now as the other implementation works.
 data {
   int<lower=2> N;     // number of stars
   int<lower=0> Nrv;     // number of stars with RVs
@@ -49,6 +57,8 @@ parameters {
 
 transformed parameters {
   matrix[3,3] Sigma;
+  vector[3] vi[N];  // individaul velocities
+
   vector[3] a_model[N];
   real rv_model[Nrv];
 
@@ -56,36 +66,37 @@ transformed parameters {
 
   for(i in 1:N) {
     a_model[i][1] = 1000./d[i];
-    a_model[i][2] = M[i,1] * v0 / (d[i]/1000.) / 4.74;
-    a_model[i][3] = M[i,2] * v0 / (d[i]/1000.) / 4.74;
+    a_model[i][2] = M[i,1] * vi[i] / (d[i]/1000.) / 4.74;
+    a_model[i][3] = M[i,2] * vi[i] / (d[i]/1000.) / 4.74;
   }
 
   if (Nrv > 0) {
     for(i in 1:Nrv) {
-      rv_model[i] = M[irv[i]+1, 3] * v0;
+      rv_model[i] = M[irv[i]+1, 3] * vi[irv[i]+1];
     }
   }
 }
 
 model {
-  matrix[3,3] D[N];       // modified covariance matrix
-
   // priors
   v0 ~ normal(0, 100);
   sigv ~ cauchy(0, 2.5);
   Omega ~ lkj_corr(2);
+  print(v0);
+  print(sigv);
+  print(Omega);
 
   for(i in 1:N) {
-    D[i] = C[i];
-    D[i,2:3,2:3] = D[i,2:3,2:3] + M[i,1:2] * Sigma * transpose(M[i,1:2]) / (d[i]/1000.)^2 / 4.74^2;
+    vi[i] ~ multi_normal(v0, Sigma);
   }
+
   // likelihood
   for(i in 1:N) {
-    a[i] ~ multi_normal(a_model[i], D[i]);
+    a[i] ~ multi_normal(a_model[i], C[i]);
   }
 
   if(Nrv > 0)
     for(i in 1:Nrv) {
-      rv[i] ~ normal(rv_model[i], sqrt(M[i,3] * Sigma * transpose(M[i,3]) + (rv_error[i])^2));
+      rv[i] ~ normal(rv_model[i], rv_error[i]);
     }
 }

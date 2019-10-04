@@ -5,11 +5,13 @@ import numpy as np
 import pystan
 import arviz as az
 
+from kinesis.utils import decompose_T
+
 logger = logging.getLogger(__name__)
 
 ROOT = os.path.abspath(os.path.dirname(__file__))
 
-__all__ = ["get_model", "Fitter", "FitResult"]
+__all__ = ["get_model", "Fitter", "FitResult", "AnisotropicDisperion"]
 
 
 def model_path(model_name):
@@ -278,6 +280,9 @@ class FitResult(object):
             "observed_data": ["a", "rv"],
         }
         azfit = az.from_pystan(stanfit, **azkwargs)
+        if "T_param" in azfit.posterior.keys():
+            for k, v in decompose_T(azfit.posterior.T_param).items():
+                azfit.posterior[k] = v
         return azfit
 
     def save(self, filename):
@@ -291,3 +296,126 @@ class FitResult(object):
         with open(filename, "rb") as f:
             model, stanfit = pickle.load(f)
         return cls(stanfit)
+
+
+class AnisotropicDisperion(object):
+    """class to facilitate cluster fitting
+
+    recompile : bool
+        True to force recompilation of the stan model.
+
+    Attributes
+    ----------
+    model : pystan.StanModel
+        compiled stan model
+    """
+
+    def __init__(self, recompile=False):
+        # self.model = get_model("anisotropic_rv2", recompile=recompile)
+        self.model = get_model("anisotropic_rv", recompile=recompile)
+
+        # default parameters to query
+        self._pars = ["v0", "sigv", "Omega"]
+
+    def validate_dataframe(self, df):
+        """Validate that the dataframe has required columns
+
+        Parameters
+        ----------
+        df : pandas.DataFrame
+            data
+
+        Raises
+        ------
+        ValueError
+            if any column is missing.
+        """
+        required_columns = [
+            "ra",
+            "dec",
+            "parallax",
+            "pmra",
+            "pmdec",
+            "parallax_error",
+            "pmra_error",
+            "pmdec_error",
+            "parallax_pmra_corr",
+            "parallax_pmdec_corr",
+            "pmra_pmdec_corr",
+        ]
+        for col in required_columns:
+            if col not in df:
+                raise ValueError(f"Dataframe is missing {col}")
+        # if self.include_T:
+        #     for col in ["radial_velocity", "radial_velocity_error"]:
+        #         if col not in df:
+        #             raise ValueError(f"`include_T` is True but df is missing {col}")
+
+    def fit(self, df, sample=True, **kwargs):
+        """Fit model to the given data
+
+        Parameters
+        ----------
+        df : pandas.DataFrame
+            astrometry + RV data with Gaia-like column names
+        sample : bool, optional
+            draw mcmc samples, by default True
+            If False, this will do opimization.
+        b0 : np.array
+            [x, y, z] defining cluster center
+            If include_T is True, b0 must be specified.
+        **kwargs
+            Additional keyword arguments are passed to
+            pystan.StanModel.optimizing or pystan.StanModel.sampling.
+
+        Returns
+        -------
+        OrderedDict or pystan.StanFit4Model
+            If sample is False, the return type is OrderedDict from pystan.StanModel.optimizing.
+        """
+
+        if "data" in kwargs:
+            raise ValueError("`data` should be specified as pandas.DataFrame.")
+        self.validate_dataframe(df)
+
+        N = len(df)
+        if ("radial_velocity" not in df) or (df["radial_velocity"].notna().sum() == 0):
+            rv = np.empty(0, float)
+            rv_error = np.empty(0, float)
+            irv = np.empty(0, int)
+            Nrv = 0
+        else:
+            irv = np.arange(N)[df["radial_velocity"].notna()]
+            rv = df["radial_velocity"].values[irv]
+            rv_error = df["radial_velocity_error"].values[irv]
+            Nrv = len(irv)
+        data = dict(
+            N=len(df),
+            ra=df["ra"].values,
+            dec=df["dec"].values,
+            a=df[["parallax", "pmra", "pmdec"]].values,
+            C=df.g.make_cov(),
+            rv=rv,
+            rv_error=rv_error,
+            irv=irv,
+            Nrv=Nrv,
+        )
+
+        # TODO: init with MAP
+        def init_func():
+            return dict(
+                d=1e3 / df["parallax"].values,
+                sigv=[1.5, 1.5, 1.5],
+                v0=np.random.normal(scale=50, size=3),
+                Omega=np.eye(3),
+            )
+
+        init = kwargs.pop("init", init_func)
+
+        if sample:
+            pars = kwargs.pop("pars", self._pars)
+            stanfit = self.model.sampling(data=data, init=init, pars=pars, **kwargs)
+            # return FitResult(stanfit)
+            return stanfit
+        else:
+            return self.model.optimizing(data=data, init=init, **kwargs)
