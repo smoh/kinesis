@@ -12,17 +12,17 @@ font.size : 15
 text.usetex : False
 
 axes.titlesize : 18
-axes.linewidth       : 1.5
+axes.linewidth       : 1.
 
-grid.linewidth       : 1.5
+grid.linewidth       : 1.
 grid.color           : black
 
 lines.linewidth : 2
 
 xtick.major.size     : 10
 xtick.minor.size     : 0
-xtick.major.width    : 1.5
-xtick.minor.width    : 1.5
+xtick.major.width    : 1.
+xtick.minor.width    : 1.
 xtick.major.pad      : 7
 xtick.direction      : in
 xtick.top            : False
@@ -30,8 +30,8 @@ xtick.bottom         : True
 
 ytick.major.size     : 10
 ytick.minor.size     : 0
-ytick.major.width    : 1.5
-ytick.minor.width    : 1.5
+ytick.major.width    : 1.
+ytick.minor.width    : 1.
 ytick.major.pad      : 7
 ytick.direction      : in
 ytick.right          : False
