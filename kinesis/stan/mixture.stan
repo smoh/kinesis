@@ -61,6 +61,11 @@ parameters {
   real<lower=0> sigv;       // dispersion     [km/s]
 
   matrix[3, 3] T[include_T ? 1 : 0];    // km/s/kpc = m/s/pc
+
+  // simplex[2] theta;            // mixing proportion for the contamination
+  real<lower=0,upper=1> lambda;
+  vector[3] v0_bg;
+  real<lower=0> sigv_bg;
 }
 
 // transformed parameters are stored, too.
@@ -69,14 +74,15 @@ transformed parameters {
   real rv_model[Nrv];
   vector[3] b[N];
 
+  vector[3] a_bg[N];
+  real rv_bg[Nrv];
+
   matrix[3, 3] T_param;
   if (include_T) {
     T_param = T[1];
   } else {
     T_param = rep_matrix(0., 3, 3);
   }
-  // print(T_param);
-
 
   for (j in 1:N) {
     b[j][1] = d[j] * cos(dec_rad[j]) * cos(ra_rad[j]);
@@ -88,42 +94,109 @@ transformed parameters {
     a_model[i][1] = 1000./d[i];
     a_model[i][2] = M[i,1] * (v0 + T_param/1000.*(b[i] - b0)) / (d[i]/1000.) / 4.74;
     a_model[i][3] = M[i,2] * (v0 + T_param/1000.*(b[i] - b0)) / (d[i]/1000.) / 4.74;
+
+    a_bg[i][1] = 1000./d[i];
+    a_bg[i][2] = M[i,1] * (v0_bg) / (d[i]/1000.) / 4.74;
+    a_bg[i][3] = M[i,2] * (v0_bg) / (d[i]/1000.) / 4.74;
   }
 
   if (Nrv > 0) {
     for(i in 1:Nrv) {
       rv_model[i] = M[irv[i]+1, 3] * (v0 + T_param/1000.*(b[irv[i]+1] - b0));
+      rv_bg[i] = M[irv[i]+1, 3] * (v0_bg);
     }
   }
 }
 
 model {
   matrix[3,3] D[N];       // modified covariance matrix
+  matrix[3,3] D_bg[N];       // modified covariance matrix
+  // vector[3] sigma_bg = [10, 50, 50]';
+  real lpsi[N];
+  real lpsi_bg[N];
+
+  for(i in 1:N) {
+    lpsi[i] = 0.;
+    lpsi_bg[i] = 0.;
+  }
 
 
-  // v0 ~ normal(0, 100);
+  v0 ~ normal(0, 50);
+  sigv ~ cauchy(0, 3);
+  sigv_bg ~ normal(30, 20);
+  v0_bg ~ normal(0, 50);
+  for (i in 1:3) {
+    for (j in 1:3){
+      T_param[i,j] ~ normal(0, 50);
+    }
+  }
   // sigv ~ normal(0, 10);
 
   // likelihood
   for(i in 1:N) {
     D[i] = C[i];
-    // D[i,2,2] += sigv^2 / (d[i]/1000.)^2 / 4.74^2;
-    // D[i,3,3] += sigv^2 / (d[i]/1000.)^2 / 4.74^2;
-    D[i,2,2] = D[i,2,2] + sigv^2 / (d[i]/1000.)^2 / 4.74^2;
-    D[i,3,3] = D[i,3,3] + sigv^2 / (d[i]/1000.)^2 / 4.74^2;
-    // print(i, D[i])
-  }
+    D[i,2,2] +=  sigv^2 / (d[i]/1000.)^2 / 4.74^2;
+    D[i,3,3] +=  sigv^2 / (d[i]/1000.)^2 / 4.74^2;
 
-  for(i in 1:N) {
-    a[i] ~ multi_normal(a_model[i], D[i]);
+    D_bg[i] = C[i];
+    D_bg[i,2,2] +=  sigv_bg^2 / (d[i]/1000.)^2 / 4.74^2;
+    D_bg[i,3,3] +=  sigv_bg^2 / (d[i]/1000.)^2 / 4.74^2;
   }
-
+  
   if(Nrv > 0)
     for(i in 1:Nrv) {
-      rv[i] ~ normal(rv_model[i], sqrt(sigv^2 + (rv_error[i])^2));
+      lpsi[irv[i]+1] += normal_lpdf(rv[i] | rv_model[i], sqrt(sigv^2 + (rv_error[i])^2));
+      lpsi_bg[irv[i]+1] += normal_lpdf(rv[i] | rv_bg[i], sqrt(sigv_bg^2 + (rv_error[i])^2));
     }
-}
 
+  for(i in 1:N) {
+    target += log_mix(lambda,
+      multi_normal_lpdf(a[i] | a_model[i], D[i]) + lpsi[i],
+      multi_normal_lpdf(a[i] | a_bg[i], D_bg[i]) + lpsi_bg[i]
+      );
+  }
+
+}
+generated quantities {
+  matrix[3,3] D[N];       // modified covariance matrix
+  matrix[3,3] D_bg[N];       // modified covariance matrix
+  // vector[3] sigma_bg = [10, 50, 50]';
+  real lpsi[N];
+  real lpsi_bg[N];
+
+  real probmem[N];
+  real lps[2];
+
+  for(i in 1:N) {
+    lpsi[i] = 0.;
+    lpsi_bg[i] = 0.;
+  }
+
+
+
+  // likelihood
+  for(i in 1:N) {
+    D[i] = C[i];
+    D[i,2,2] +=  sigv^2 / (d[i]/1000.)^2 / 4.74^2;
+    D[i,3,3] +=  sigv^2 / (d[i]/1000.)^2 / 4.74^2;
+
+    D_bg[i] = C[i];
+    D_bg[i,2,2] +=  sigv_bg^2 / (d[i]/1000.)^2 / 4.74^2;
+    D_bg[i,3,3] +=  sigv_bg^2 / (d[i]/1000.)^2 / 4.74^2;
+  }
+  
+  if(Nrv > 0)
+    for(i in 1:Nrv) {
+      lpsi[irv[i]+1] += normal_lpdf(rv[i] | rv_model[i], sqrt(sigv^2 + (rv_error[i])^2));
+      lpsi_bg[irv[i]+1] += normal_lpdf(rv[i] | rv_bg[i], sqrt(sigv_bg^2 + (rv_error[i])^2));
+    }
+
+  for(i in 1:N) {
+    lps[1] = log(lambda) + multi_normal_lpdf(a[i] | a_model[i], D[i]) + lpsi[i];
+    lps[2] = log(1-lambda) + multi_normal_lpdf(a[i] | a_bg[i], D_bg[i]) + lpsi_bg[i];
+    probmem[i] = lps[1]-log_sum_exp(lps[1], lps[2]);
+  }
+}
 // generated quantities {
 //   vector[3] a_hat[N];
 //   real rv_hat[Nrv];
