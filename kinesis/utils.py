@@ -24,7 +24,7 @@ def save_stanfit(stanfit, outfile):
     """
     model = stanfit.stanmodel
     with open(outfile, "wb") as f:
-        pickle.dump({"model": model, "fit": fit}, f, protocol=-1)
+        pickle.dump({"model": model, "fit": stanfit}, f, protocol=-1)
 
 
 def load_stanfit(filename):
