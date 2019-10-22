@@ -277,7 +277,7 @@ class ClusterMembers(object):
             radial_velocity=df.radial_velocity.values * u.km / u.s,
         )
 
-    def observe(self, cov=None, error_from=None):
+    def observe(self, cov=None, error_from=None, rv_error=None):
         """
         Add noise to cluster members using eithar covariance matrices
         or randomly assigning Gaia dataframe.
@@ -287,6 +287,10 @@ class ClusterMembers(object):
             this is the covariance assumed for all members.
             Otherwise it must be (N, 3, 3).
         error_from : pandas.DataFrame
+            gaia_source table containing error and correlation (e.g., 'pmra_pmdec_corr')
+            columns. Members are assigned errors from this table randomly.
+        rv_error : (N,) array
+            Radial velocity errors in km/s. NaN is treated as missing.
 
         """
         if (cov is not None) and (error_from is not None):
@@ -330,4 +334,10 @@ class ClusterMembers(object):
             irand = np.random.randint(0, high=len(error_from), size=self.N)
             cov = cov_from_gaia_table(error_from.loc[irand])
             self.observe(cov=cov)
+        if rv_error is not None:
+            if rv_error.shape != (self.N,):
+                raise ValueError(f"rv_error must have shape ({self.N},) instead it is {rv_error.shape}")
+            rv_observed = np.random.normal(self.truth['radial_velocity'], rv_error)
+            data['radial_velocity'] = rv_observed
+            data['radial_velocity_error'] = rv_error
         return self

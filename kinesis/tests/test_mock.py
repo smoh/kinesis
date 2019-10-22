@@ -106,3 +106,15 @@ class TestCluster(object):
         assert (cl2.members.observed.parallax_pmra_corr == 0).all()
         assert (cl2.members.observed.parallax_pmdec_corr == 0).all()
         assert (cl2.members.observed.pmra_pmdec_corr == 0).all()
+
+    def test_rv_error(self):
+        v0, sigv, N = [-6.3, 45.2, 5.3], 2.5, 1000
+        cl = (
+            mock.Cluster(v0, sigv)
+            .sample_sphere(N=N, Rmax=1)
+            .observe(cov=np.eye(3) * 4, rv_error=np.array([1] * 999 + [np.nan]))
+        )
+        assert "radial_velocity" in cl.members.observed.columns
+        assert "radial_velocity_error" in cl.members.observed.columns
+        assert np.isnan(cl.members.observed["radial_velocity"].values[-1])
+        assert np.isnan(cl.members.observed["radial_velocity_error"].values[-1])
