@@ -11,6 +11,7 @@ __all__ = [
     "cov_from_gaia_table",
     "decompose_T",
     "rotate_T_to_galactic",
+    "EigenvalueDecomposition",
 ]
 
 
@@ -87,7 +88,7 @@ def rotate_T_to_galactic(T):
         .transform_to(coord.Galactic)
         .cartesian.xyz.value
     )
-    rotated_T = np.einsum("ij,njk,kl->nil", rotmat, T, rotmat.T)
+    rotated_T = np.einsum("ij,...jk,kl->...il", rotmat, T, rotmat.T)
     return rotated_T
 
 
@@ -127,3 +128,24 @@ def cov_from_gaia_table(df):
         df["pmra_error"] * df["pmdec_error"] * df["pmra_pmdec_corr"]
     ).values[:, None]
     return C
+
+
+class EigenvalueDecomposition(object):
+    def __init__(self, a):
+        """
+        a : (N, 3, 3)
+        """
+        self.a = a
+        w, v = np.linalg.eig(a)
+        i_wsort = np.argsort(w, axis=1)
+        sorted_v = np.stack([v[j][:, i] for j, i in enumerate(i_wsort)])
+        sorted_w = np.sort(w, axis=1)
+        self.w = sorted_w
+        self.v = sorted_v
+
+        # eigenvectors to angles
+        theta = np.rad2deg(np.arctan(sorted_v[:, 1, :] / sorted_v[:, 0, :]))
+        R = np.hypot(sorted_v[:, 0, :], sorted_v[:, 1, :])
+        cosphi = np.cos(np.arctan(sorted_v[:, 2, :] / R))
+        self.theta = theta
+        self.cosphi = cosphi
