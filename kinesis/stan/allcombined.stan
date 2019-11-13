@@ -189,7 +189,7 @@ generated quantities {
   for(i in 1:N) {
     lps[1] = log(f_mem) + multi_normal_lpdf(a[i] | a_model[i], D[i]) + lpsi[i];
     lps[2] = log(1-f_mem) + multi_normal_lpdf(a[i] | a_bg[i], D_bg[i]) + lpsi_bg[i];
-    probmem[i] = lps[1]-log_sum_exp(lps[1], lps[2]);
+    probmem[i] = exp(lps[1]-log_sum_exp(lps[1], lps[2]));
   }
 }
 
