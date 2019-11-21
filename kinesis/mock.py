@@ -185,7 +185,7 @@ class Cluster(object):
             v_y=ui.T[1] * u.km / u.s,
             v_z=ui.T[2] * u.km / u.s,
             representation_type="cartesian",
-            differential_type="cartesian"
+            differential_type="cartesian",
         )
         self.members = ClusterMembers(coordinates)
         return self
@@ -335,9 +335,12 @@ class ClusterMembers(object):
             cov = cov_from_gaia_table(error_from.loc[irand])
             self.observe(cov=cov)
         if rv_error is not None:
+            rv_error = np.array(rv_error)
             if rv_error.shape != (self.N,):
-                raise ValueError(f"rv_error must have shape ({self.N},) instead it is {rv_error.shape}")
-            rv_observed = np.random.normal(self.truth['radial_velocity'], rv_error)
-            data['radial_velocity'] = rv_observed
-            data['radial_velocity_error'] = rv_error
+                raise ValueError(
+                    f"rv_error must have shape ({self.N},) instead it is {rv_error.shape}"
+                )
+            rv_observed = np.random.normal(self.truth["radial_velocity"], rv_error)
+            data["radial_velocity"] = rv_observed
+            data["radial_velocity_error"] = rv_error
         return self
