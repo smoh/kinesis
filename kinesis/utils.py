@@ -12,6 +12,7 @@ __all__ = [
     "decompose_T",
     "rotate_T_to_galactic",
     "EigenvalueDecomposition",
+    "add_transformed_posterior",
 ]
 
 
@@ -149,3 +150,46 @@ class EigenvalueDecomposition(object):
         cosphi = np.cos(np.arctan(sorted_v[:, 2, :] / R))
         self.theta = theta
         self.cosphi = cosphi
+
+
+def make_summary_dataframe(azfit):
+    pass
+
+
+def add_transformed_posterior(azfit):
+    """Add transformed posterior samples to az.InferenceData
+
+    Returns az.InferenceData with transformed samples added
+
+    Added parameters:
+    Sigma : (3, 3) Dispersion matrix
+    omegax, omegay, omegaz, w1, w2, w3, w4, w5, kappa:
+        decomposed paramters of velocity gradient tensor
+    
+    *_gal : above parameters in Galactic frame
+    """
+    v = azfit
+
+    for ck, cv in decompose_T(v.posterior["T_param"]).items():
+        v.posterior[ck] = cv
+    # Combine scale and correlation matrix of Sigma to variance matrix
+    sigv_samples, Omega_samples = v.posterior["sigv"], v.posterior["Omega"]
+    Sigma_samples = np.einsum(
+        "cni,cnij,cnj->cnij", sigv_samples, Omega_samples, sigv_samples
+    )
+    v.posterior["Sigma"] = (
+        ("chain", "draw", "Sigma_dim_0", "Sigma_dim_1"),
+        Sigma_samples,
+    )
+    v.posterior["Sigma_gal"] = (
+        ("chain", "draw", "Sigma_dim_0", "Sigma_dim_1"),
+        rotate_T_to_galactic(Sigma_samples),
+    )
+    # Add rotated T matrix and decomposition
+    v.posterior["T_param_gal"] = (
+        ("chain", "draw", "dim0", "dim1"),
+        rotate_T_to_galactic(v.posterior["T_param"]),
+    )
+    for ck, cv in decompose_T(v.posterior["T_param_gal"]).items():
+        v.posterior[ck + "_gal"] = cv
+    return v
