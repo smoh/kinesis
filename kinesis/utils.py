@@ -16,12 +16,14 @@ __all__ = [
 ]
 
 
+
 def save_stanfit(stanfit, outfile):
     """Save stanfit object as pickle
 
     stanfit : pystan.StanFit4Model
         fit object
     outfile : str
+
         path to output file
     """
     model = stanfit.stanmodel
