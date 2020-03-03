@@ -5,6 +5,8 @@ mnras/
 dask-worker-space
 scratch/
 
+.idea/
+
 ### https://raw.github.com/github/gitignore/45dca6a85905883a6459208e249822068f652ac3/TeX.gitignore
 
 ## Core latex/pdflatex auxiliary files:
