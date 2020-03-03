@@ -108,6 +108,9 @@ def validate_output_path(ctx, param, path):
 
 
 def validate_rbin(ctx, param, value):
+    # value will be empty tuple () if not given
+    if value == ():
+        return None
     if (value[0] >= 0) & (value[1] >= 0) & (value[0] < value[1]):
         return value
     else:
@@ -123,10 +126,15 @@ def validate_rbin(ctx, param, value):
     callback=validate_rbin,
     help="fit only stars within (r1, r2) from the cluster center",
 )
+@click.option(
+    "--brightcorr",
+    help="correct bright source (G<12) proper motion for frame rotation according to Lindegren formula",
+    is_flag=True,
+)
 @click.argument(
     "output_path", type=click.Path(writable=True), callback=validate_output_path
 )
-def main(output_path, rbin=None):
+def main(output_path, rbin, brightcorr=False):
     """
     Fit and save sample pickle to OUTPUT_PATH.
     """
@@ -145,6 +153,10 @@ def main(output_path, rbin=None):
                 "Only {} stars at r={}; doing nothing".format(len(df_fit), (r1, r2))
             )
             return
+
+    if brightcorr:
+        click.echo("Applying proper motion correction to bright sources")
+        df_fit = df_fit.g.correct_brightsource_pm()
 
     fit_and_save(df_fit, output_path)
 
