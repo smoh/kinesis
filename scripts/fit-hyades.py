@@ -13,7 +13,7 @@ import gapipes as gp
 b_c_icrs = np.array([17.15474298, 41.28962638, 13.69105771])
 
 
-def fit_and_save(srcdf, outfile):
+def fit_and_save(srcdf, outfile, v0=None):
     necessary_columns = [
         "ra",
         "dec",
@@ -53,35 +53,67 @@ def fit_and_save(srcdf, outfile):
         "b0": b0,
     }
 
-    def stan_init():
-        return dict(
-            d=1e3 / data["parallax"].values,
-            sigv=[0.5, 0.5, 0.5],
-            Omega=np.eye(3),
-            v0=[-5, 45, 5],
-            T=np.zeros(shape=(1, 3, 3)),
-            v0_bg=[0, 0, 0],
-            sigv_bg=50.0,
-            f_mem=0.95,
-        )
+    if v0 is None:
 
-    stanmodel = kn.get_model("allcombined")
-    fit = stanmodel.sampling(
-        data=data_dict,
-        init=stan_init,
-        pars=[
-            "v0",
-            "sigv",
-            "Omega",
-            "T_param",
-            "v0_bg",
-            "sigv_bg",
-            "f_mem",
-            "probmem",
-            "a_model",
-            "rv_model",
-        ],
-    )
+        def stan_init():
+            return dict(
+                d=1e3 / data["parallax"].values,
+                sigv=[0.5, 0.5, 0.5],
+                Omega=np.eye(3),
+                v0=[-5, 45, 5],
+                T=np.zeros(shape=(1, 3, 3)),
+                v0_bg=[0, 0, 0],
+                sigv_bg=50.0,
+                f_mem=0.95,
+            )
+
+        stanmodel = kn.get_model("allcombined")
+        fit = stanmodel.sampling(
+            data=data_dict,
+            init=stan_init,
+            pars=[
+                "v0",
+                "sigv",
+                "Omega",
+                "T_param",
+                "v0_bg",
+                "sigv_bg",
+                "f_mem",
+                "probmem",
+                "a_model",
+                "rv_model",
+            ],
+        )
+    else:
+        data_dict["v0"] = v0
+
+        def stan_init():
+            return dict(
+                d=1e3 / data["parallax"].values,
+                sigv=[0.5, 0.5, 0.5],
+                Omega=np.eye(3),
+                T=np.zeros(shape=(1, 3, 3)),
+                v0_bg=[0, 0, 0],
+                sigv_bg=50.0,
+                f_mem=0.95,
+            )
+
+        stanmodel = kn.get_model("allcombined-fixed-v0")
+        fit = stanmodel.sampling(
+            data=data_dict,
+            init=stan_init,
+            pars=[
+                "sigv",
+                "Omega",
+                "T_param",
+                "v0_bg",
+                "sigv_bg",
+                "f_mem",
+                "probmem",
+                "a_model",
+                "rv_model",
+            ],
+        )
     kn.save_stanfit(fit, outfile)
 
 
@@ -131,10 +163,11 @@ def validate_rbin(ctx, param, value):
     help="correct bright source (G<12) proper motion for frame rotation according to Lindegren formula",
     is_flag=True,
 )
+@click.option("--v0", help="fixed value of v0 = (vx, vy, vz)", type=float, nargs=3)
 @click.argument(
     "output_path", type=click.Path(writable=True), callback=validate_output_path
 )
-def main(output_path, rbin, brightcorr=False):
+def main(output_path, rbin, brightcorr=False, v0=None):
     """
     Fit and save sample pickle to OUTPUT_PATH.
     """
@@ -158,7 +191,9 @@ def main(output_path, rbin, brightcorr=False):
         click.echo("Applying proper motion correction to bright sources")
         df_fit = df_fit.g.correct_brightsource_pm()
 
-    fit_and_save(df_fit, output_path)
+    if v0 == ():
+        v0 = None
+    fit_and_save(df_fit, output_path, v0=v0)
 
 
 if __name__ == "__main__":
