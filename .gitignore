@@ -4,6 +4,7 @@ mnras/
 .tags*
 dask-worker-space
 scratch/
+*.pickle
 
 .idea/
 
