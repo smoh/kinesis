@@ -4,6 +4,7 @@ Make latex table of fit summary using arviz and pandas to_latex method.
 import pandas as pd
 import numpy as np
 import arviz as az
+import click
 
 import kinesis as kn
 
@@ -11,25 +12,6 @@ kn.set_mpl_style()
 
 df = kn.data.load_hyades_dataset()
 b0 = np.array([17.15474298, 41.28962638, 13.69105771])
-fit_dict = {
-    "cl": kn.load_stanfit("../scripts/myfit_0_10.pickle"),
-    "tails": kn.load_stanfit("../scripts/myfit_10_m_fixed_v0.pickle"),
-}
-azfit_dict = {
-    k: kn.add_transformed_posterior(az.from_pystan(v)) for k, v in fit_dict.items()
-}
-
-# To report everything else except v0/v0_bg in Galactic,
-# convert covariance to sigv and correlation matrix from Sigma_gal
-azfit = azfit_dict["cl"]
-Sigma = azfit.posterior["Sigma_gal"].values
-diag = np.sqrt(Sigma[:, :, [0, 1, 2], [0, 1, 2]])
-# ij component is sigma_i * sigma_j
-denom = np.einsum("mnij,mnjk->mnik", diag[:, :, :, None], diag[:, :, None, :])
-Omega = Sigma / denom
-for k, v in azfit_dict.items():
-    v.posterior["Omega_gal"] = (("chain", "draw", "Omega_dim_0", "Omega_dim_1"), Omega)
-    v.posterior["sigv_gal"] = (("chain", "draw", "sigv_dim"), diag)
 
 # map arviz summary index -> latex column name
 _column_name_dict = {
@@ -87,8 +69,6 @@ _columns_to_remove = [
     "Omega_gal[2,1]",
 ]
 
-azfit = azfit_dict["cl"]
-
 
 def make_summary_table(azfit):
     pars = [
@@ -108,6 +88,22 @@ def make_summary_table(azfit):
         "v0_bg",
         "sigv_bg",
     ]
+
+    azfit = kn.add_transformed_posterior(azfit)
+    # To report everything else except v0/v0_bg in Galactic,
+    # convert covariance to sigv and correlation matrix from Sigma_gal
+    Sigma = azfit.posterior["Sigma_gal"].values
+    diag = np.sqrt(Sigma[:, :, [0, 1, 2], [0, 1, 2]])
+    # ij component is sigma_i * sigma_j
+    denom = np.einsum("mnij,mnjk->mnik", diag[:, :, :, None], diag[:, :, None, :])
+    Omega = Sigma / denom
+    azfit.posterior["Omega_gal"] = (
+        ("chain", "draw", "Omega_dim_0", "Omega_dim_1"),
+        Omega,
+    )
+    azfit.posterior["sigv_gal"] = (("chain", "draw", "sigv_dim"), diag)
+
+    # az.summary does not allow missing pars
     pars_for_az = []
     pars_missing = []
     for p in pars:
@@ -122,14 +118,30 @@ def make_summary_table(azfit):
     return summary_table
 
 
-frames = [make_summary_table(azfit_dict["cl"]), make_summary_table(azfit_dict["tails"])]
-merged = (
-    pd.concat(frames, keys=["cl", "tails"], axis=1)
-    .reindex(frames[0].index)
-    .rename(
-        index=_column_name_dict, columns={"hpd_3%": "hpd 3\%", "hpd_97%": "hpd 97\%"}
-    )
+@click.command()
+@click.option(
+    "--fit", "-f", type=(str, str), multiple=True, help="(key, path/to/pickle)"
 )
-merged.to_latex(
-    "../report/fit-summary.tex", na_rep="", escape=False, multicolumn_format="c"
-)
+@click.option("--latex", is_flag=True)
+def main(fit, latex):
+    frames = [make_summary_table(az.from_pystan(kn.load_stanfit(v))) for k, v in fit]
+    keys = [k for k, v in fit]
+    if latex:
+        merged = (
+            pd.concat(frames, keys=keys, axis=1)
+            .reindex(frames[0].index)
+            .rename(
+                index=_column_name_dict,
+                columns={"hpd_3%": "hpd 3\%", "hpd_97%": "hpd 97\%"},
+            )
+        )
+        output_file = "../report/fit-summary.tex"
+        merged.to_latex(output_file, na_rep="", escape=False, multicolumn_format="c")
+        click.echo("output written to {}".format(output_file))
+    else:
+        merged = pd.concat(frames, keys=keys, axis=1).reindex(frames[0].index)
+        click.echo(merged)
+
+
+if __name__ == "__main__":
+    main()
