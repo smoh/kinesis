@@ -29,7 +29,8 @@ def check_path(outfile):
 @click.argument("outfile")
 @click.option("--seed", type=int, help="random number generator seed")
 @click.option("--dryrun", is_flag=True, help="do not actually do fitting")
-def main(outfile, seed=382948, dryrun=False):
+@click.option("--use_harps_rv", is_flag=True, help="swap DR2 RVs with HARPS RVs")
+def main(outfile, seed=382948, dryrun=False, use_harps_rv=False):
     """
     Generate and fit mock data
     """
@@ -37,6 +38,9 @@ def main(outfile, seed=382948, dryrun=False):
 
     out_full = pd.read_csv("../data/hyades_full.csv")
     df = out_full.loc[out_full["in_dr2"] == True].reset_index(drop=True)
+    if use_harps_rv:
+        df['radial_velocity'] = df['RV_HARPS_leao']
+        df['radial_velocity_error'] = df['eRV_HARPS_leao']
 
     # Randomly divide into 90% member and 10% background
     N = len(df)
@@ -75,7 +79,7 @@ def main(outfile, seed=382948, dryrun=False):
     data_bg = bg.members.observed.copy()
     data = data_cl.assign(mem=1).append(data_bg.assign(mem=0)).reset_index(drop=True)
 
-    stanmodel = kn.get_model("allcombined")
+    stanmodel = kn.get_model("allcombined", recompile=True)
     # build input data to stan
     b0 = truth_T0["b0"]
     N = len(data)
