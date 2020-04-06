@@ -24,6 +24,8 @@ def xyz_icrs_to_galactic(xyz):
 
 
 df = kn.data.load_hyades_dataset()
+df = df.loc[df['Member_r19']!='other'].reset_index(drop=True)
+print(len(df))
 cl_gaia = df.loc[df["in_dr2"] == True].copy()
 
 b_c_icrs_cl_gaia_mean = cl_gaia.g.icrs.cartesian.xyz.mean(axis=1).value
