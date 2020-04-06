@@ -164,14 +164,24 @@ def validate_rbin(ctx, param, value):
     is_flag=True,
 )
 @click.option("--v0", help="fixed value of v0 = (vx, vy, vz)", type=float, nargs=3)
+@click.option(
+    "--exclude-other", help="exclude stars flagged 'other' by Roser", is_flag=True
+)
+@click.option("--rv-only", help="only consider stars with RVs", is_flag=True)
 @click.argument(
     "output_path", type=click.Path(writable=True), callback=validate_output_path
 )
-def main(output_path, rbin, brightcorr=False, v0=None):
+def main(
+    output_path, rbin, brightcorr=False, v0=None, exclude_other=False, rv_only=False
+):
     """
     Fit and save sample pickle to OUTPUT_PATH.
     """
     df = pd.read_csv("../data/hyades_full.csv")
+    if exclude_other:
+        df = df.loc[df["Member_r19"] != "other"]
+    if rv_only:
+        df = df.loc[df["radial_velocity"].notna()]
 
     df_fit = None
     if rbin is None:
