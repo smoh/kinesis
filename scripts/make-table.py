@@ -128,7 +128,7 @@ def main(fit, latex):
     keys = [k for k, v in fit]
     if latex:
         merged = (
-            pd.concat(frames, keys=keys, axis=1)
+            pd.concat(frames, keys=keys, axis=1, sort=True)
             .reindex(frames[0].index)
             .rename(
                 index=_column_name_dict,
@@ -139,7 +139,7 @@ def main(fit, latex):
         merged.to_latex(output_file, na_rep="", escape=False, multicolumn_format="c")
         click.echo("output written to {}".format(output_file))
     else:
-        merged = pd.concat(frames, keys=keys, axis=1).reindex(frames[0].index)
+        merged = pd.concat(frames, keys=keys, axis=1, sort=True).reindex(frames[0].index)
         click.echo(merged)
 
 
