@@ -22,7 +22,7 @@ mystyledict = {
     "font.family": "serif",
     "font.serif": "Liberation Serif",
     #     'font.serif':'CMU Serif',
-    #     'axes.unicode_minus':False,
+    'axes.unicode_minus':False,
     "font.size": 12.0,
     "grid.color": "tab:gray",
     "grid.linewidth": 0.7,

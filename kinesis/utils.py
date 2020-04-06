@@ -13,8 +13,9 @@ __all__ = [
     "rotate_T_to_galactic",
     "EigenvalueDecomposition",
     "add_transformed_posterior",
+    "add_cartesian_xv",
+    "reconstruct_df_from_stanfit",
 ]
-
 
 
 def save_stanfit(stanfit, outfile):
@@ -195,3 +196,38 @@ def add_transformed_posterior(azfit):
     for ck, cv in decompose_T(v.posterior["T_param_gal"]).items():
         v.posterior[ck + "_gal"] = cv
     return v
+
+
+def add_cartesian_xv(df):
+    df["x"], df["y"], df["z"] = df.g.icrs.cartesian.xyz.value
+    df["vx"], df["vy"], df["vz"] = df.g.icrs.velocity.d_xyz.value
+    df["gx"], df["gy"], df["gz"] = df.g.galactic.cartesian.xyz.value
+    df["gvx"], df["gvy"], df["gvz"] = df.g.galactic.velocity.d_xyz.value
+
+
+# add mean probmem to data
+def reconstruct_df_from_stanfit(stanfit):
+    dat = stanfit.data
+    reconstructed_df = pd.DataFrame(
+        dict(
+            parallax=dat["a"][:, 0],
+            pmra=dat["a"][:, 1],
+            pmdec=dat["a"][:, 2],
+            radial_velocity=np.nan,
+            ra=dat["ra"],
+            dec=dat["dec"],
+        )
+    )
+
+    reconstructed_df["radial_velocity"].iloc[dat["irv"]] = dat["rv"]
+    reconstructed_df["mean_pmem"] = stanfit["probmem"].mean(axis=0)
+    add_cartesian_xv(reconstructed_df)
+    return reconstructed_df
+
+
+def add_cartesian_xv(df):
+    df["x"], df["y"], df["z"] = df.g.icrs.cartesian.xyz.value
+    df["vx"], df["vy"], df["vz"] = df.g.icrs.velocity.d_xyz.value
+    df["gx"], df["gy"], df["gz"] = df.g.galactic.cartesian.xyz.value
+    df["gvx"], df["gvy"], df["gvz"] = df.g.galactic.velocity.d_xyz.value
+    return df
