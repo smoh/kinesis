@@ -214,12 +214,14 @@ def reconstruct_df_from_stanfit(stanfit):
             pmra=dat["a"][:, 1],
             pmdec=dat["a"][:, 2],
             radial_velocity=np.nan,
+            radial_velocity_error=np.nan,
             ra=dat["ra"],
             dec=dat["dec"],
         )
     )
 
     reconstructed_df["radial_velocity"].iloc[dat["irv"]] = dat["rv"]
+    reconstructed_df["radial_velocity_error"].iloc[dat["irv"]] = dat["rv_error"]
     reconstructed_df["mean_pmem"] = stanfit["probmem"].mean(axis=0)
     add_cartesian_xv(reconstructed_df)
     return reconstructed_df
