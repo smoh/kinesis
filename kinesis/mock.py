@@ -41,7 +41,7 @@ def sample_uniform_sphere(x0=None, Rmax=1, N=1, return_icrs=False):
 class Cluster(object):
     """class representing a mock star cluster"""
 
-    def __init__(self, v0, sigmav, omegas=None, ws=None, k=0, b0=None):
+    def __init__(self, v0, sigmav, omegas=None, ws=None, k=0, b0=None, T=None):
         """
         Make a cluster with mean velocity `v0` and dispersion `sigma`
 
@@ -82,7 +82,7 @@ class Cluster(object):
         assert v0.shape == (3,), "v0 has a wrong shape"
         # If there are any first-order terms, the center should be
         # defined.
-        if any((omegas, ws, k)) and (b0 is None):
+        if any((omegas, ws, k, T is not None)) and (b0 is None):
             raise ValueError(
                 "'b0' should be given when any first-order term is non-zero."
             )
@@ -92,29 +92,33 @@ class Cluster(object):
         self.b0 = b0
         self.v0 = v0
         self.sigmav = sigmav
-        if omegas:
-            omegas = np.atleast_1d(omegas)
-            assert omegas.shape == (3,), "omegas has a wrong shape"
+        if T is not None:
+            T = np.array(T)
+            assert T.shape == (3,3), 'T has a wrong shape'
         else:
-            omegas = np.zeros(3)
-        self.omegas = omegas
-        if ws:
-            ws = np.atleast_1d(ws)
-            assert ws.shape == (5,), "ws has a wrong shape"
-        else:
-            ws = np.zeros(5)
-        self.ws = ws
-        self.k = k
+            if omegas:
+                omegas = np.atleast_1d(omegas)
+                assert omegas.shape == (3,), "omegas has a wrong shape"
+            else:
+                omegas = np.zeros(3)
+            self.omegas = omegas
+            if ws:
+                ws = np.atleast_1d(ws)
+                assert ws.shape == (5,), "ws has a wrong shape"
+            else:
+                ws = np.zeros(5)
+            self.ws = ws
+            self.k = k
 
-        # construct tensor T from omegas, ws and k
-        # velocity field at b is v(b) = v0 + T(b-b0)
-        T = np.array(
-            [
-                [ws[3], ws[2] - omegas[2], ws[1] + omegas[1]],
-                [ws[2] + omegas[2], ws[4], ws[0] - omegas[0]],
-                [ws[1] - omegas[1], ws[0] + omegas[0], 3 * k - ws[3] - ws[4]],
-            ]
-        )
+            # construct tensor T from omegas, ws and k
+            # velocity field at b is v(b) = v0 + T(b-b0)
+            T = np.array(
+                [
+                    [ws[3], ws[2] - omegas[2], ws[1] + omegas[1]],
+                    [ws[2] + omegas[2], ws[4], ws[0] - omegas[0]],
+                    [ws[1] - omegas[1], ws[0] + omegas[0], 3 * k - ws[3] - ws[4]],
+                ]
+            )
         self.T = T
         self.members = None
 
