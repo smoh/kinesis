@@ -15,6 +15,9 @@ import kinesis as kn
 
 print(f"pystan v{pystan.__version__}")
 
+# hard-coded center value
+b_c_icrs = np.array([17.15474298, 41.28962638, 13.69105771])
+
 
 def check_path(outfile):
     """Strictly check given output file path"""
@@ -36,15 +39,20 @@ def main(outfile, seed=382948, dryrun=False, use_harps_rv=False):
     """
     check_path(outfile)
 
-    out_full = pd.read_csv("../data/hyades_full.csv")
-    df = out_full.loc[out_full["in_dr2"] == True].reset_index(drop=True)
+    df0 = pd.read_csv("../data/hyades_full.csv")
+    df0 = df0.loc[df0["Member_r19"] != "other"].copy().reset_index(drop=True)
+    r1, r2 = 0, 10
+    xyz = df0.g.icrs.cartesian.xyz.value
+    r_c = np.linalg.norm(xyz - b_c_icrs[:, None], axis=0)
+    df = df0.loc[(r_c > r1) & (r_c < r2)].copy()
+
     if use_harps_rv:
         df['radial_velocity'] = df['RV_HARPS_leao']
         df['radial_velocity_error'] = df['eRV_HARPS_leao']
 
     # Randomly divide into 90% member and 10% background
     N = len(df)
-    idx_mem = np.sort(np.random.choice(np.arange(len(df)), size=463, replace=False))
+    idx_mem = np.sort(np.random.choice(np.arange(len(df)), size=380, replace=False))
     idx_bg = np.sort(np.array(list(set(np.arange(len(df))) - set(idx_mem))))
     truth_T0 = dict(
         b0=[17.7, 41.2, 13.3], v0=np.array([-6.32, 45.24, 5.30]), sigmav=0.3
@@ -79,7 +87,7 @@ def main(outfile, seed=382948, dryrun=False, use_harps_rv=False):
     data_bg = bg.members.observed.copy()
     data = data_cl.assign(mem=1).append(data_bg.assign(mem=0)).reset_index(drop=True)
 
-    stanmodel = kn.get_model("allcombined", recompile=True)
+    stanmodel = kn.get_model("allcombined", recompile=False)
     # build input data to stan
     b0 = truth_T0["b0"]
     N = len(data)

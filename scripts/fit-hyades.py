@@ -168,11 +168,15 @@ def validate_rbin(ctx, param, value):
     "--exclude-other", help="exclude stars flagged 'other' by Roser", is_flag=True
 )
 @click.option("--rv-only", help="only consider stars with RVs", is_flag=True)
+@click.option("--use-harps-rv", is_flag=True, help="swap DR2 RVs with HARPS RVs")
+@click.option("--exclude-ruwe-above", help="exclude sources with RUWE above this value", type=float)
+@click.option("--multiply-astrometric-error-by", help="multiplicative factor to inflate error by", type=float)
 @click.argument(
     "output_path", type=click.Path(writable=True), callback=validate_output_path
 )
 def main(
-    output_path, rbin, brightcorr=False, v0=None, exclude_other=False, rv_only=False
+    output_path, rbin, brightcorr=False, v0=None, exclude_other=False, rv_only=False,
+    exclude_ruwe_above=None, multiply_astrometric_error_by=None, use_harps_rv=False
 ):
     """
     Fit and save sample pickle to OUTPUT_PATH.
@@ -180,8 +184,10 @@ def main(
     df = pd.read_csv("../data/hyades_full.csv")
     if exclude_other:
         df = df.loc[df["Member_r19"] != "other"]
-    if rv_only:
-        df = df.loc[df["radial_velocity"].notna()]
+
+    if use_harps_rv:
+        df['radial_velocity'] = df['RV_HARPS_leao']
+        df['radial_velocity_error'] = df['eRV_HARPS_leao']
 
     df_fit = None
     if rbin is None:
@@ -200,6 +206,15 @@ def main(
     if brightcorr:
         click.echo("Applying proper motion correction to bright sources")
         df_fit = df_fit.g.correct_brightsource_pm()
+    
+    if exclude_ruwe_above is not None:
+        df_fit = df_fit.loc[df_fit['ruwe']<exclude_ruwe_above].copy()
+    
+    if multiply_astrometric_error_by is not None:
+        df_fit[['parallax_error','pmra_error', 'pmdec_error']] *= multiply_astrometric_error_by  
+    
+    if rv_only:
+        df_fit = df_fit.loc[df_fit["radial_velocity"].notna()]
 
     if v0 == ():
         v0 = None
