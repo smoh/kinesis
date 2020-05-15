@@ -3,8 +3,14 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to kinesis's documentation!
+Welcome to kinesis documentation!
 ===================================
+
+Kinesis is a package for fitting the internal kinematics of a star cluster
+with astrometry and (incomplete) radial velocity data of its members.
+It also has utilities to generate mock clusters and mock observations.
+
+
 
 .. toctree::
    :maxdepth: 2

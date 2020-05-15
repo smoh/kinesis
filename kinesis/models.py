@@ -26,10 +26,9 @@ def get_model(model_name, recompile=False):
     """ Get compiled StanModel
     This will compile the stan model if a cached pickle does not exist.
 
-    model_name : str
-        model name without `.stan`
-    recompile : bool
-        If True, force recompilation even when cached model exists.
+    Args:
+        model_name (str): model name without `.stan`
+        recompile (bool): Force force recompilation.
     """
     model_file = model_path(model_name)
     cache_file = model_cache_path(model_name)
@@ -47,17 +46,13 @@ def get_model(model_name, recompile=False):
 class Fitter(object):
     """class to facilitate cluster fitting
 
-    include_T : bool
-        True to include linear velocity gradient in the model.
-    recompile : bool
-        True to force recompilation of the stan model.
+    Args:
+        include_T (bool): True to include linear velocity gradient in the model.
+        recompile (boo): True to force recompilation of the stan model.
 
-    Attributes
-    ----------
-    include_T : bool
-        True if linear velocity gradient is included in the model.
-    model : pystan.StanModel
-        compiled stan model
+    Attributes:
+        include_T :(bool): True if linear velocity gradient is included in the model.
+        model (StanModel): compiled stan model
     """
 
     def __init__(self, include_T=True, recompile=False):
@@ -79,15 +74,11 @@ class Fitter(object):
     def validate_dataframe(self, df):
         """Validate that the dataframe has required columns
 
-        Parameters
-        ----------
-        df : pandas.DataFrame
-            data
+        Args:
+            df (DataFrame): data
 
-        Raises
-        ------
-        ValueError
-            if any column is missing.
+        Raises:
+            ValueError: if any column is missing.
         """
         required_columns = [
             "ra",
@@ -113,24 +104,18 @@ class Fitter(object):
     def fit(self, df, sample=True, b0=None, **kwargs):
         """Fit model to the given data
 
-        Parameters
-        ----------
-        df : pandas.DataFrame
-            astrometry + RV data with Gaia-like column names
-        sample : bool, optional
-            draw mcmc samples, by default True
-            If False, this will do opimization.
-        b0 : np.array
-            [x, y, z] defining cluster center
-            If include_T is True, b0 must be specified.
-        **kwargs
-            Additional keyword arguments are passed to
-            pystan.StanModel.optimizing or pystan.StanModel.sampling.
+        Args:
+            df (DataFrame): astrometry + RV data with Gaia-like column names
+            sample (bool, optional): draw mcmc samples, by default True
+                If False, this will do opimization.
+            b0 (array): [x, y, z] defining cluster center
+                If include_T is True, b0 must be specified.
+            **kwargs: Additional keyword arguments are passed to
+                pystan.StanModel.optimizing or pystan.StanModel.sampling.
 
-        Returns
-        -------
-        OrderedDict or pystan.StanFit4Model
-            If sample is False, the return type is OrderedDict from pystan.StanModel.optimizing.
+        Returns:
+            OrderedDict or pystan.StanFit4Model:
+                If sample is False, the return type is OrderedDict from pystan.StanModel.optimizing.
         """
 
         if "data" in kwargs:
@@ -193,9 +178,8 @@ class Fitter(object):
     def calculate_rv_residual(stanfit):
         """Calculate (rv_data - rv_model) / sqrt(rv_error^2 + sigv_model^2)
 
-        Returns
-        -------
-        res : 2d-array of (n_posterior_samples, n_rv_sources).
+        Returns:
+            res: 2d-array of (n_posterior_samples, n_rv_sources).
 
         Sliced in axis=0, they should be distributed as Normal(0, 1).
         """
@@ -210,9 +194,8 @@ class Fitter(object):
 
         where D is covariance matrix of observed errors + sigv.
 
-        Returns
-        -------
-        g : 2d array, (n_samples, n_sources)
+        Returns:
+            g: 2d array, (n_samples, n_sources)
         
         Sliced in axis=0, they should be distributed as chi2(df=3).
         """
@@ -254,12 +237,9 @@ class Fitter(object):
 class FitResult(object):
     """Fit result object to facilitate converting and saving data structure
 
-    Attributes
-    ----------
-    stanfit : StanFit4Model object
-        stan fit result
-    azfit : arviz.InferenceData
-        fit result for arviz plotting
+    Attributes:
+        stanfit (StanFit4Model): stan fit result
+        azfit (arviz.InferenceData): fit result for arviz plotting
     """
 
     def __init__(self, stanfit):
@@ -424,17 +404,15 @@ class AnisotropicDisperion(object):
 class MixtureModel(object):
     """class to facilitate cluster fitting
 
-    include_T : bool
-        True to include linear velocity gradient in the model.
-    recompile : bool
-        True to force recompilation of the stan model.
+    Args:
+        include_T : bool
+            True to include linear velocity gradient in the model.
+        recompile : bool
+            True to force recompilation of the stan model.
 
-    Attributes
-    ----------
-    include_T : bool
-        True if linear velocity gradient is included in the model.
-    model : pystan.StanModel
-        compiled stan model
+    Attributes:
+        include_T (bool): True if linear velocity gradient is included in the model.
+        model (pystan.StanModel): compiled stan model
     """
 
     def __init__(self, include_T=True, recompile=False):

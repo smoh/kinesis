@@ -11,20 +11,34 @@ import astropy.units as u
 
 from .utils import cov_from_gaia_table
 
-__all__ = ["sample_uniform_sphere", "Cluster"]
+__all__ = ["sample_uniform_sphere", "Cluster", "func"]
 
+def func(arg1: int, arg2: str) -> bool:
+
+    """Summary line.
+
+    Extended description of function.
+
+    Args:
+        arg1: Description of arg1
+        arg2: Description of arg2
+
+    Returns:
+        Description of return value
+
+    """
+    return True
 
 def sample_uniform_sphere(x0=None, Rmax=1, N=1, return_icrs=False):
     """ Sample points within a uniform density sphere
 
-    x0 : array-like, (3,)
-        mean position of the sphere
-    Rmax : float, optional
-        maximum radius of the sphere
-    N : int, optional
-        number of points to sample
+    Args:
+        x0 (array-like, (3,)): mean position of the sphere
+        Rmax (float, optional): maximum radius of the sphere
+        N (int, optional): number of points to sample
 
-    Returns (3, N) array of xyz positions
+    Returns:
+        (3, N) array xyz positions
     """
     rhat = np.random.normal(size=(3, N))
     rhat /= np.linalg.norm(rhat, axis=0)
@@ -39,44 +53,36 @@ def sample_uniform_sphere(x0=None, Rmax=1, N=1, return_icrs=False):
 
 
 class Cluster(object):
-    """class representing a mock star cluster"""
+    """
+    Make a cluster with mean velocity `v0` and dispersion `sigma`.
 
-    def __init__(self, v0, sigmav, omegas=None, ws=None, k=0, b0=None, T=None):
-        """
-        Make a cluster with mean velocity `v0` and dispersion `sigma`
+    All length units are assumed to be pc.
+    All velocity units are assumed to be km/s.
+    All angular frequency units are in km/s/kpc = m/s/pc.
 
-        All length units are assumed to be pc.
-        All velocity units are assumed to be km/s.
-        All angular frequency units are in km/s/kpc = m/s/pc.
-
-        v0 : array-like, (3,)
-            Mean velocity vector in km/s
-        sigmav : float, array-like
-            If float, interpreted as isotropic velocity dispersion.
-            If (3,) array, interpreted as (sigma_vx, sigma_vy, sigma_vz).
-            If (3,3) array, interpreted as the *covariance* matrix.
-            All in km/s.
-        omegas : array-like, (3,), optional
+    Args:
+        v0 (array-like, (3,)): Mean velocity vector in km/s
+        sigmav (float, array-like): dispersion
+            If float, interpreted as the isotropic velocity dispersion.
+            If (3,) array, interpreted as (sigma_x, sigma_y, sigma_z).
+            If (3,3) array, interpreted as the *covariance* matrix in (km/s)**2.
+        omegas (array-like, (3,), optional):
             Angular frequencies of rotation around x, y, z axis
-        ws : array-like, (5,), optional
-            Non-isotropic dilation
-        k : float, optional
-            Isotropic expansion (or contraction)
-        b0 : array-like, (3,), optional
+        ws (array-like, (5,), optional): Non-isotropic dilation
+        k (float, optional): Isotropic expansion (or contraction)
+        b0 (array-like, (3,), optional):
             Reference position vector where velocity field v = v0.
             Only matters when at least one of `omegas`, `ws` and `k` is non-zero.
 
-        Attributes
-        ----------
-        members : None or `ClusterMembers` instance
+    Attributes:
+        members (None or :obj:`ClusterMembers` instance):
             Use sample_
-        b0 : array-like, [x, y, z]
-            center of cluster in pc
-        v0 : array-like, [vx, vy, vz]
-            mean velocity of cluster in km/s
-        sigmav : float, array-like
-            velocity dispersion
-        """
+        b0 (array-like, [x, y, z]): center of cluster in pc
+        v0 (array-like, [vx, vy, vz]): mean velocity of cluster in km/s
+        sigmav (float, array-like): velocity dispersion
+    """
+
+    def __init__(self, v0, sigmav, omegas=None, ws=None, k=0, b0=None, T=None):
         # TODO option to accept astropy Quantities for parameters
         v0 = np.atleast_1d(v0)
         assert v0.shape == (3,), "v0 has a wrong shape"
@@ -132,8 +138,9 @@ class Cluster(object):
         """
         Make a cluster from astropy coordinates `cluster_coord`
 
-        cluster_coord : astropy.coordinates.BaseCoordinateFrame instance
-            coordinates containing cluster position and velocity
+        Args:
+            cluster_coord (BaseCoordinateFrame):
+                coordinates containing cluster position and velocity
 
         The rest of the arguments are the same as `Cluster`.
         """
@@ -149,14 +156,14 @@ class Cluster(object):
 
     def sample_sphere(self, N=1, Rmax=10):
         """
-        Smple cluster members around mean position with uniform density
+        Sample cluster members around mean position with uniform density
 
-        N : int
-            number of stars
-        Rmax : float
-            maximum radius from the mean position in pc
+        Args:
+            N (int): number of stars
+            Rmax (float): maximum radius from the mean position in pc
 
-        Returns self with `members` attribute populated.
+        Returns:
+            self with `members` attribute populated.
         """
         if self.members:
             raise AttributeError("The cluster already have members.")
@@ -167,10 +174,11 @@ class Cluster(object):
         """
         Sample cluster members at given `positions`
 
-        positions : astropy.coordinates.BaseCoordinateFrame instance
-            positions of member stars
+        Args:
+            positions (BaseCoordinateFrame): positions of member stars
 
-        Returns self with `members` attribute populated.
+        Returns:
+            self with `members` attribute populated.
         """
         if not isinstance(positions, coord.BaseCoordinateFrame):
             raise ValueError("`positions` should be astropy coordinates")
@@ -225,26 +233,20 @@ class Cluster(object):
 
 
 class ClusterMembers(object):
-    """ class representing members of a Mock cluster """
+    """
+    Initialize cluster members with coordinates
+
+    Args:
+        coordinates (BaseCoordinateFrame): must contain positions and velocities
+
+    Args:
+        N (int): number of members
+        icrs (ICRS): ICRS coordinates with spherical representation
+        df (DataFrame): simulated data without noise with Gaia-like columns
+        data (DataFrame): simulated data with noise with Gaia-like columns
+    """
 
     def __init__(self, coordinates):
-        """
-        Initialize cluster members with coordinates
-
-        coordinates : astropy.coordinates.BaseCoordinateFrame instance
-            must contain positions and velocities
-
-        Attributes
-        ----------
-        N : int
-            number of members
-        icrs : astropy.coordinates.ICRS instance
-            ICRS coordinates with spherical representation
-        df : pandas.DataFrame
-            simulated data without noise with Gaia-like columns
-        data : pandas.DataFrame
-            simulated data with noise with Gaia-like columns
-        """
         if hasattr(coordinates, "differentials"):
             raise ValueError("`coordinates` should have differentials")
         self.N = len(coordinates)
@@ -283,18 +285,19 @@ class ClusterMembers(object):
 
     def observe(self, cov=None, error_from=None, rv_error=None):
         """
-        Add noise to cluster members using eithar covariance matrices
+        Add noise to cluster members using either covariance matrices
         or randomly assigning Gaia dataframe.
 
-        cov : array of covariance matrix
-            If `cov` is one covariance matrix (3, 3) of parallax, pmra, pmdec,
-            this is the covariance assumed for all members.
-            Otherwise it must be (N, 3, 3).
-        error_from : pandas.DataFrame
-            gaia_source table containing error and correlation (e.g., 'pmra_pmdec_corr')
-            columns. Members are assigned errors from this table randomly.
-        rv_error : (N,) array
-            Radial velocity errors in km/s. NaN is treated as missing.
+        Args:
+            cov (array): covariance matrix.
+                If `cov` is one covariance matrix (3, 3) of parallax, pmra, pmdec,
+                this is the covariance assumed for all members.
+                Otherwise it must be (N, 3, 3).
+            error_from (DataFrame): Take errors from this Gaia DataFrame.
+                gaia_source table containing error and correlation (e.g., 'pmra_pmdec_corr')
+                columns. Members are assigned errors from this table randomly.
+            rv_error (array):
+                Radial velocity errors in km/s. NaN is treated as missing.
 
         """
         if (cov is not None) and (error_from is not None):
