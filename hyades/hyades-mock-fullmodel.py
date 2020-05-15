@@ -47,8 +47,8 @@ def main(outfile, seed=382948, dryrun=False, use_harps_rv=False):
     df = df0.loc[(r_c > r1) & (r_c < r2)].copy()
 
     if use_harps_rv:
-        df['radial_velocity'] = df['RV_HARPS_leao']
-        df['radial_velocity_error'] = df['eRV_HARPS_leao']
+        df["radial_velocity"] = df["RV_HARPS_leao"]
+        df["radial_velocity_error"] = df["eRV_HARPS_leao"]
 
     # Randomly divide into 90% member and 10% background
     N = len(df)
@@ -121,6 +121,7 @@ def main(outfile, seed=382948, dryrun=False, use_harps_rv=False):
         )
 
     if dryrun:
+        print("This is a dry run; doing nothing.")
         return
     fit = stanmodel.sampling(
         data=data_dict,

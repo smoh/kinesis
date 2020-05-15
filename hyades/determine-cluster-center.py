@@ -14,6 +14,7 @@ import numpy as np
 import astropy.coordinates as coord
 
 import kinesis as kn
+import data
 
 kn.set_mpl_style()
 
@@ -23,9 +24,9 @@ def xyz_icrs_to_galactic(xyz):
     return c.transform_to(coord.Galactic).cartesian.xyz.value
 
 
-df = kn.data.load_hyades_dataset()
-df = df.loc[df['Member_r19']!='other'].reset_index(drop=True)
-print(len(df), 'rows')
+df = data.load_hyades_dataset()
+df = df.loc[df["Member_r19"] != "other"].reset_index(drop=True)
+print(len(df), "rows")
 cl_gaia = df.loc[df["in_dr2"] == True].copy()
 
 b_c_icrs_cl_gaia_mean = cl_gaia.g.icrs.cartesian.xyz.mean(axis=1).value
@@ -137,11 +138,12 @@ ax_xz.set_xlabel("$x$ [pc]")
 ax_xz.set_ylabel("$z$ [pc]")
 fig.suptitle("Galactic")
 fig.tight_layout()
-fig.savefig("../report/galactic_xyz.pdf")
+fig.savefig("report/galactic_xyz.pdf")
 
-N_rv = (df['radial_velocity'].notna()).sum()
-N_10 = (r_c<10).sum()
-N_10_rv = ((r_c<10) & (df['radial_velocity'].notna())).sum()
-print('N rv =', N_rv)
-print('N(r_c<10) = {} N(r_c<10 and has rv) = {}'.format(N_10, N_10_rv))
-print('N(r_c>10) = {} N(r_c<10 and has rv) = {}'.format(len(df)-N_10, N_rv-N_10_rv))
+print("check radial velocities")
+N_rv = (df["radial_velocity"].notna()).sum()
+N_10 = (r_c < 10).sum()
+N_10_rv = ((r_c < 10) & (df["radial_velocity"].notna())).sum()
+print("N rv =", N_rv)
+print("N(r_c<10) = {} N(r_c<10 and has rv) = {}".format(N_10, N_10_rv))
+print("N(r_c>10) = {} N(r_c<10 and has rv) = {}".format(len(df) - N_10, N_rv - N_10_rv))
