@@ -12,7 +12,12 @@ package_directory = os.path.dirname(os.path.abspath(__file__))
 data_directory = os.path.join(os.path.dirname(package_directory), "data")
 
 
-__all__ = ["load_reino2018_supp", "load_reino2018_full", "load_hyades_dataset"]
+__all__ = [
+    "load_reino2018_supp",
+    "load_reino2018_full",
+    "load_hyades_dataset",
+    "bovy_oort",
+]
 
 
 def load_reino2018_supp():
@@ -35,3 +40,9 @@ def load_hyades_dataset():
     df["gx"], df["gy"], df["gz"] = df.g.galactic.cartesian.xyz.value
     df["gvx"], df["gvy"], df["gvz"] = df.g.galactic.velocity.d_xyz.value
     return df
+
+
+bovy_oort = dict(
+    A=15.3, B=-11.9, C=-3.2, K=-3.3, stdA=0.4, stdB=0.4, stdC=0.4, stdK=0.6
+)
+
