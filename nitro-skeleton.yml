@@ -1,0 +1,31 @@
+# Leave bare bones requirements by hand
+name: nitro
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - arviz=0.6.1
+  - astropy=4.0
+  - astroquery=0.3.10
+  - bokeh=1.4.0
+  - cartopy=0.17.0
+  - corner=2.0.1
+  - cython=0.29.14
+  - galpy=1.5
+  - h5py=2.10.0
+  - jupyterlab=1.2.4
+  - matplotlib=3.1.2
+  - nbdime=1.1.0
+  - pystan=2.19.1.1
+  - pytest=5.3.2
+  - schwimmbad=0.3.0
+  - scikit-learn=0.22
+  - scipy=1.4.1
+  - seaborn=0.9.0
+  - pip
+  - pip:
+    - astro-gala==1.1
+    - black==19.10b0
+    - click==6.7
+    - daft==0.1.0
+    - emcee==3.0.2
