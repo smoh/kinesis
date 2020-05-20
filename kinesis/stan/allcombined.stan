@@ -1,4 +1,6 @@
-// A model of cluster proper motions including linear velocity field
+// A model of proper motions and RVs of stars in a cluster
+// including linear velocity field and anisotropic velocity dispersion.
+// Contamination is taken into account by two-component mixture model.
 //
 // NOTE: See https://dev.to/martinmodrak/optional-parametersdata-in-stan-4o33
 //       for a trick to handle optional inputs in stan
