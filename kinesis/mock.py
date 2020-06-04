@@ -113,6 +113,29 @@ class Cluster(object):
         self.T = T
         self.members = None
 
+    @property
+    def icrs(self):
+        """astropy coordinate object for the cluster reference position"""
+        if self.b0 is None:
+            raise ValueError("You cannot create a coordinate object when `b0` is None")
+        cc = coord.ICRS(
+            *(self.b0 * u.pc),
+            *(self.v0 * u.km / u.s),
+            representation_type=coord.CartesianRepresentation,
+            differential_type=coord.CartesianDifferential,
+        )
+        # Construct the "usual" ICRS with the default spherical representation and
+        # more familiar attribute names.
+        cc_icrs = coord.ICRS(
+            cc.spherical.lon,
+            cc.spherical.lat,
+            cc.spherical.distance,
+            cc.spherical.differentials["s"].d_lon,
+            cc.spherical.differentials["s"].d_lat,
+            cc.spherical.differentials["s"].d_distance,
+        )
+        return cc_icrs
+
     def __repr__(self):
         with np.printoptions(precision=3):
             s = "Cluster(b0={b0}, v0={v0}, sigmav={sigmav})".format(
