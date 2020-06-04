@@ -11,23 +11,8 @@ import astropy.units as u
 
 from .utils import cov_from_gaia_table
 
-__all__ = ["sample_uniform_sphere", "Cluster", "func"]
+__all__ = ["sample_uniform_sphere", "Cluster"]
 
-def func(arg1: int, arg2: str) -> bool:
-
-    """Summary line.
-
-    Extended description of function.
-
-    Args:
-        arg1: Description of arg1
-        arg2: Description of arg2
-
-    Returns:
-        Description of return value
-
-    """
-    return True
 
 def sample_uniform_sphere(x0=None, Rmax=1, N=1, return_icrs=False):
     """ Sample points within a uniform density sphere
@@ -100,7 +85,7 @@ class Cluster(object):
         self.sigmav = sigmav
         if T is not None:
             T = np.array(T)
-            assert T.shape == (3,3), 'T has a wrong shape'
+            assert T.shape == (3, 3), "T has a wrong shape"
         else:
             if omegas:
                 omegas = np.atleast_1d(omegas)
@@ -129,9 +114,11 @@ class Cluster(object):
         self.members = None
 
     def __repr__(self):
-        return "Cluster(b0={b0}, v0={v0}, sigmav={sigmav})".format(
-            b0=list(self.b0), v0=list(self.v0), sigmav=self.sigmav
-        )
+        with np.printoptions(precision=3):
+            s = "Cluster(b0={b0}, v0={v0}, sigmav={sigmav})".format(
+                b0=np.array(self.b0), v0=np.array(self.v0), sigmav=self.sigmav
+            )
+        return s
 
     @classmethod
     def from_coord(cls, cluster_coord, sigmav, omegas=None, ws=None):
