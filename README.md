@@ -1,5 +1,5 @@
 # kinesis
 
-kinematic modelling of clusters with gaia
+Kinematic modelling of clusters with the Gaia data.
 
 [demo](notebooks/model_validation.ipynb)
