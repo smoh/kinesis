@@ -205,4 +205,4 @@ for cax in axes:
     cax.set_ylim(np.array(ylim) + np.r_[[-1, 1]])
 
 fig.tight_layout(rect=[None, None, None, 1], h_pad=1, w_pad=0.2)
-fig.savefig("fig1.pdf", dpi=120)
+fig.savefig("../report/perspective-effects.pdf", dpi=120)
