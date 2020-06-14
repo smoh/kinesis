@@ -112,6 +112,12 @@ model {
   // v0 ~ normal(0, 100);
   // sigv ~ normal(0, 10);
 
+  for (i in 1:3) {
+    for (j in 1:3) {
+      T_param[i,j] ~ normal(0, 50);  # Note: in m/s/pc
+    }
+  }
+
   // likelihood
   for(i in 1:N) {
     a[i] ~ multi_normal(a_model[i], D[i]);
