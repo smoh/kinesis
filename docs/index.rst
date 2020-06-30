@@ -11,16 +11,10 @@ with astrometry and (incomplete) radial velocity data of its members.
 It also has utilities to generate mock clusters and mock observations.
 
 
-
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
 
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+   install
+   tutorial
+   models
+   api

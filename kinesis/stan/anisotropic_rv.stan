@@ -1,3 +1,5 @@
+// A model of proper motions and RVs of stars in a cluster
+// wth anisotropic velocity dispersion but no linear field or contamination.
 data {
   int<lower=2> N;     // number of stars
   int<lower=0> Nrv;     // number of stars with RVs

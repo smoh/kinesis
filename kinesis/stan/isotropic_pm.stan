@@ -1,3 +1,5 @@
+// Model of proper motions of stars in a cluster
+// assuming isotropic dispersion.
 data {
   int<lower=2> N;     // number of stars
 
