@@ -11,7 +11,7 @@ import astropy.units as u
 
 from .utils import cov_from_gaia_table
 
-__all__ = ["sample_uniform_sphere", "Cluster"]
+__all__ = ["sample_uniform_sphere", "Cluster", "ClusterMembers"]
 
 
 def sample_uniform_sphere(x0=None, Rmax=1, N=1, return_icrs=False):
@@ -21,6 +21,7 @@ def sample_uniform_sphere(x0=None, Rmax=1, N=1, return_icrs=False):
         x0 (array-like, (3,)): mean position of the sphere
         Rmax (float, optional): maximum radius of the sphere
         N (int, optional): number of points to sample
+        return_icrs (bool): return astropy ICRS coordinates
 
     Returns:
         (3, N) array xyz positions
@@ -49,19 +50,20 @@ class Cluster(object):
         v0 (array-like, (3,)): Mean velocity vector in km/s
         sigmav (float, array-like): dispersion
             If float, interpreted as the isotropic velocity dispersion.
-            If (3,) array, interpreted as (sigma_x, sigma_y, sigma_z).
-            If (3,3) array, interpreted as the *covariance* matrix in (km/s)**2.
+            If (3,) array, interpreted as :math:`(\sigma_x, \sigma_y, \sigma_z)`.
+            If (3,3) array, interpreted as the *covariance* matrix
+            in :math:`( {\\rm km} /{\\rm s} )^2`
         omegas (array-like, (3,), optional):
             Angular frequencies of rotation around x, y, z axis
-        ws (array-like, (5,), optional): Non-isotropic dilation
-        k (float, optional): Isotropic expansion (or contraction)
+        ws (array-like, (5,), optional): Non-isotropic dilation.
+        k (float, optional): Isotropic expansion (or contraction).
         b0 (array-like, (3,), optional):
             Reference position vector where velocity field v = v0.
             Only matters when at least one of `omegas`, `ws` and `k` is non-zero.
 
     Attributes:
         members (None or :obj:`ClusterMembers` instance):
-            Use sample_
+            Use `sample_sphere` or `sample_at` to populate the cluster.
         b0 (array-like, [x, y, z]): center of cluster in pc
         v0 (array-like, [vx, vy, vz]): mean velocity of cluster in km/s
         sigmav (float, array-like): velocity dispersion
@@ -115,7 +117,7 @@ class Cluster(object):
 
     @property
     def icrs(self):
-        """astropy coordinate object for the cluster reference position"""
+        """astropy coordinate object for the cluster reference position, b0"""
         if self.b0 is None:
             raise ValueError("You cannot create a coordinate object when `b0` is None")
         cc = coord.ICRS(
@@ -214,7 +216,7 @@ class Cluster(object):
 
     @property
     def Sigma(self):
-        """Convert dispersion to (3, 3) covariance matrix"""
+        """(3, 3) dispersion matrix :math:`\Sigma`"""
         if np.ndim(self.sigmav) == 0:
             return self.sigmav ** 2 * np.eye(3)
         elif np.shape(self.sigmav) == (3,):

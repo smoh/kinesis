@@ -1,8 +1,12 @@
 API documentation
 =================
 
-.. automodule:: kinesis.mock
+Mock clusters
+-------------
+
+.. autoclass:: kinesis.mock.Cluster
     :members:
 
-.. automodule:: kinesis.models
+.. autoclass:: kinesis.mock.ClusterMembers
     :members:
+
