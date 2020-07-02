@@ -21,11 +21,8 @@ __all__ = [
 def save_stanfit(stanfit, outfile):
     """Save stanfit object as pickle
 
-    stanfit : pystan.StanFit4Model
-        fit object
-    outfile : str
-
-        path to output file
+    stanfit (pystan.StanFit4Model): fit object
+    outfile (str): path to output file
     """
     model = stanfit.stanmodel
     with open(outfile, "wb") as f:
@@ -44,14 +41,10 @@ def load_stanfit(filename):
 def decompose_T(T):
     """Decompose velocity gradient tensor to interpretable components
 
-    T : array, (..., 3, 3)
-        dv_j / dv_i
+    T (array, (..., 3, 3)): dv_j / dv_i
     
-    Returns
-    -------
-    dict
-
-    
+    Returns:
+        dict: decomposed T, i.e., omegax, omegay, omegaz, w1, ..., w5, and kappa.
     """
     if T.shape[-2:] != (3, 3):
         raise ValueError("`T` must have shape (..., 3, 3)")
@@ -80,7 +73,9 @@ def decompose_T(T):
 
 
 def rotate_T_to_galactic(T):
-    """R T R^T"""
+    """
+    Rotate T=dv_i/dv_j in ICRS to Galactic frame, R T R^T
+    """
     # hack rotation matrix from icrs -> galactic
     rotmat = (
         coord.ICRS(
@@ -155,21 +150,17 @@ class EigenvalueDecomposition(object):
         self.cosphi = cosphi
 
 
-def make_summary_dataframe(azfit):
-    pass
-
-
 def add_transformed_posterior(azfit):
     """Add transformed posterior samples to az.InferenceData
 
     Returns az.InferenceData with transformed samples added
 
     Added parameters:
-    Sigma : (3, 3) Dispersion matrix
-    omegax, omegay, omegaz, w1, w2, w3, w4, w5, kappa:
-        decomposed paramters of velocity gradient tensor
     
-    *_gal : above parameters in Galactic frame
+    - Sigma : (3, 3) Dispersion matrix
+    - omegax, omegay, omegaz, w1, w2, w3, w4, w5, kappa:
+        decomposed paramters of velocity gradient tensor
+    - *_gal : above parameters in Galactic frame
     """
     v = azfit
 

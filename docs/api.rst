@@ -10,3 +10,13 @@ Mock clusters
 .. autoclass:: kinesis.mock.ClusterMembers
     :members:
 
+Models
+------
+.. automodule:: kinesis.models
+    :members:
+
+Utilities
+---------
+
+.. automodule:: kinesis.utils
+    :members:
