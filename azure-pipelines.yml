@@ -45,7 +45,8 @@ jobs:
       pip install sphinx
       pip install -U -r docs/requirements.txt
       # Additionally needs pandoc and ipython (for syntax highlighting)
-      conda install -c conda-forge pandoc ipython
+      conda install -y -c conda-forge pandoc
+      pip install ipython
     displayName: Install docs dependencies
   - bash: |
       make html
