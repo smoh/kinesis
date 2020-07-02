@@ -47,7 +47,7 @@ jobs:
     displayName: Install docs dependencies
   - bash: |
       make html
-      workingDirectory: docs/
+    workingDirectory: docs/
     displayName: Build html docs
   - bash: |
       mkdir ghpages
