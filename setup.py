@@ -30,7 +30,7 @@ EMAIL = "semyeong.oh@gmail.com"
 
 setup(
     name=NAME,
-    version=get_version('kinesis/__init__.py')
+    version=get_version("kinesis/__init__.py"),
     description=DESCRIPTION,
     author=AUTHOR,
     author_email=EMAIL,
