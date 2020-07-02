@@ -39,7 +39,7 @@ jobs:
           cd ghpages
           git clone -b gh-pages --single-branch https://smoh:${{ secrets.GITHUB_TOKEN }}@github.com/smoh/kinesis-dev.git .
           rm -rf .git
-          mv docs/_build/html/* .
+          mv ../docs/_build/html/* .
           git init
           git add -f *
           touch .nojekyll
