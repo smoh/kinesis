@@ -44,5 +44,5 @@ jobs:
           git add -f *
           touch .nojekyll
           git add .nojekyll
-          git commit -m 'Build gh-pages'
+          git -c "user.name=Semyeong Oh" -c "user.email=semyeong.oh@gmail.com" commit -m 'Build gh-pages'
           git push -f https://smoh:${{ secrets.GITHUB_TOKEN }}@github.com/smoh/kinesis-dev HEAD:gh-pages
