@@ -22,3 +22,30 @@ jobs:
       pip install pytest
       pytest .
     displayName: Run tests
+
+- job: build_and_publish_docs
+  timeoutInMinutes: 60
+  pool:
+    vmImage: Ubuntu-16.04
+  steps:
+  - bash: echo "##vso[task.prependpath]$CONDA/bin"
+    displayName: Add conda to PATH
+  - bash: conda create --yes --quiet --name kinesis python=3.7 pip
+    displayName: Create Anaconda environment
+  - bash: |
+      source activate kinesis
+      # may include this to setup.py in the end
+      pip install pandas
+      pip install git+https://github.com/smoh/gapipes.git@master
+      cd $(Build.SourcesDirectory)
+      pip install -e .
+      pip freeze | grep -E "astropy|kinesis|pystan|arviz"
+    displayName: Install dependencies
+  - bash: |
+      pip install sphinx
+      pip install -U -r docs/requirements.txt
+      displayName: Install docs dependencies
+  - bash: |
+      make html
+      workingDirectory: docs/
+    displayName: Build html docs
