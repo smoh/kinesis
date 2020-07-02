@@ -1,0 +1,47 @@
+name: build and publish docs
+
+on: [push]
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python 3.7
+        uses: s-weigand/setup-conda@v1
+        with:
+          python-version: 3.7
+      - name: Build environment
+        run: |
+          conda create --yes --quiet --name kinesis python=3.7 pip
+          source activate kinesis
+          # may include this to setup.py in the end
+          pip install pandas
+          pip install git+https://github.com/smoh/gapipes.git@master
+          cd $(Build.SourcesDirectory)
+          pip install -e .
+          pip freeze | grep -E "astropy|kinesis|pystan|arviz"
+      - name: Set up docs dependencies
+        run: |
+          pip install sphinx
+          pip install -U -r docs/requirements.txt
+          # Additionally needs pandoc and ipython (for syntax highlighting)
+          conda install -y -c conda-forge pandoc
+          pip install ipython
+      - name: Build documentation
+        run: |
+          cd docs
+          make html
+      - name: Publish to gh-pages
+        run: |
+          mkdir ghpages
+          git clone -b gh-pages --single-branch https://github.com/smoh/kinesis-dev.git .
+          rm -rf .git
+          mv docs/_build/html/* .
+          git init
+          git add -f *
+          touch .nojekyll
+          git add .nojekyll
+          git commit -m 'Build gh-pages'
+          git push -f https://github.com/smoh/kinesis-dev HEAD:gh-pages
