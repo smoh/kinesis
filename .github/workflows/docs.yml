@@ -37,7 +37,7 @@ jobs:
         run: |
           mkdir ghpages
           cd ghpages
-          git clone -b gh-pages --single-branch https://${{ secrets.GITHUB_TOKEN }}@github.com/smoh/kinesis-dev.git .
+          git clone -b gh-pages --single-branch https://smoh:${{ secrets.GITHUB_TOKEN }}@github.com/smoh/kinesis-dev.git .
           rm -rf .git
           mv docs/_build/html/* .
           git init
@@ -45,4 +45,4 @@ jobs:
           touch .nojekyll
           git add .nojekyll
           git commit -m 'Build gh-pages'
-          git push -f https://${{ secrets.GITHUB_TOKEN }}@github.com/smoh/kinesis-dev HEAD:gh-pages
+          git push -f https://smoh:${{ secrets.GITHUB_TOKEN }}@github.com/smoh/kinesis-dev HEAD:gh-pages
