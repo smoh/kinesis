@@ -44,8 +44,20 @@ jobs:
   - bash: |
       pip install sphinx
       pip install -U -r docs/requirements.txt
-      displayName: Install docs dependencies
+    displayName: Install docs dependencies
   - bash: |
       make html
       workingDirectory: docs/
     displayName: Build html docs
+  - bash: |
+      mkdir ghpages
+      git clone -b gh-pages --single-branch https://github.com/smoh/kinesis-dev.git .
+      rm -rf .git
+      mv docs/_build/html/* .
+      git init
+      git add -f *
+      touch .nojekyll
+      git add .nojekyll
+      git commit -m 'Build gh-pages'
+      git push -f https://github.com/smoh/kinesis-dev HEAD:gh-pages
+    displayName: Push to gh-pages
