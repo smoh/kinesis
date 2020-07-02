@@ -19,7 +19,8 @@ jobs:
           # may include this to setup.py in the end
           pip install pandas
           pip install git+https://github.com/smoh/gapipes.git@master
-          cd kinesis-dev
+          pwd
+          ls
           pip install -e .
           pip freeze | grep -E "astropy|kinesis|pystan|arviz"
       - name: Set up docs dependencies
