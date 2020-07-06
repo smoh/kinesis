@@ -1,6 +1,6 @@
 # kinesis
 
-Kinematic modelling of clusters with the Gaia data.
+Kinematic modelling of clusters with the [Gaia](https://www.cosmos.esa.int/web/gaia/home) data.
 
 <a href="https://smoh.space/kinesis"><img src="https://github.com/smoh/kinesis/workflows/docs/badge.svg"></a>
 
