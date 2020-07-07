@@ -18,7 +18,7 @@
 # -- Project information -----------------------------------------------------
 
 project = "kinesis"
-copyright = "2019, Semyeong Oh"
+copyright = "2019-2020, Semyeong Oh"
 author = "Semyeong Oh"
 
 
