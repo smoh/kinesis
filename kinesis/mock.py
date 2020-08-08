@@ -79,6 +79,11 @@ class Cluster(object):
             raise ValueError(
                 "'b0' should be given when any first-order term is non-zero."
             )
+        # (omegas, ws, k) and T is mutually exclusive.
+        if any((omegas, ws, k)) and (T is not None):
+            raise ValueError(
+                "Either set (omegas, ws, k) or matrix `T`; do not set both."
+            )
         if b0 is not None:
             b0 = np.atleast_1d(b0)
             assert b0.shape == (3,), "b0 has a wrong shape"

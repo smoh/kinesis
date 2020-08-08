@@ -10,11 +10,19 @@ from kinesis import mock
 import gapipes as pipes
 
 np.random.seed(73929)
-#
-# def test_sample_at():
-#     cl = mock.Cluster([12.3, 23.1, -3.5], 0.5)
-#     pos = coord.ICRS([21.3]*u.deg, [54]*u.deg, [95.2]*u.pc)
-#     cl.sample_at(pos)
+
+
+def test_sample_uniform_sphere():
+    assert mock.sample_uniform_sphere().shape == (3, 1)
+
+    r = mock.sample_uniform_sphere(return_icrs=True)
+    assert isinstance(r, coord.ICRS)
+
+    r = mock.sample_uniform_sphere(x0=[1, 2, 3], Rmax=10.0, N=10)
+    assert r.shape == (3, 10)
+
+    with pytest.raises(AssertionError):
+        mock.sample_uniform_sphere(x0=0)
 
 
 class TestCluster(object):
@@ -30,6 +38,28 @@ class TestCluster(object):
         df = pipes.add_xv(cl.members.truth, coord.ICRS)
         assert np.allclose(df[["vx", "vy", "vz"]].std().values, sigv, 0.1)
         assert np.allclose(df[["vx", "vy", "vz"]].mean().values, v0, 0.1)
+    
+    def test_T_nonzero(self):
+        v0, sigv, N = [-6.3, 45.2, 5.3], 0.0, 1000
+        cl = mock.Cluster(v0, sigv, omegas=[0,0,50.0], b0=[30, 40, 50])
+        assert np.array_equal(cl.T, np.array([[0, -50, 0], [50, 0, 0], [0, 0, 0]]))
+    
+    def test_T_nonzero_errors(self):
+        v0, sigv, N = [-6.3, 45.2, 5.3], 2.5, 1000
+        with pytest.raises(ValueError):
+            cl = mock.Cluster(v0, sigv, T=np.eye(3))
+        
+        with pytest.raises(ValueError):
+            cl = mock.Cluster(v0, sigv, omegas=[1, 0, 0])
+        
+        with pytest.raises(ValueError) as e:
+            cl = mock.Cluster(v0, sigv, b0=[0,0,0], omegas=[1,0,0], T=np.eye(3))
+        assert e.value.args[0] == "Either set (omegas, ws, k) or matrix `T`; do not set both."
+
+        with pytest.raises(AssertionError):
+            cl = mock.Cluster(v0, sigv, b0=[0,0,0], omegas=[1,0,0,0])
+        with pytest.raises(AssertionError):
+            cl = mock.Cluster(v0, sigv, b0=[0,0,0], ws=[1,0,0,0])
 
     def test_sample_at(self):
         v0, sigv, N = [-6.3, 45.2, 5.3], 2.5, 1000
