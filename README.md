@@ -3,6 +3,7 @@
 Kinematic modelling of clusters with the [Gaia](https://www.cosmos.esa.int/web/gaia/home) data.
 
 <a href="https://smoh.space/kinesis"><img src="https://github.com/smoh/kinesis/workflows/docs/badge.svg"></a>
+[![codecov](https://codecov.io/gh/smoh/kinesis/branch/master/graph/badge.svg)](https://codecov.io/gh/smoh/kinesis)
 
 Kinesis is a package for fitting the internal kinematics of a star cluster
 with astrometry and (incomplete) radial velocity data of its members.
