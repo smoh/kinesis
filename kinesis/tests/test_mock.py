@@ -47,19 +47,22 @@ class TestCluster(object):
     def test_T_nonzero_errors(self):
         v0, sigv, N = [-6.3, 45.2, 5.3], 2.5, 1000
         with pytest.raises(ValueError):
-            cl = mock.Cluster(v0, sigv, T=np.eye(3))
+            mock.Cluster(v0, sigv, T=np.eye(3))
         
         with pytest.raises(ValueError):
-            cl = mock.Cluster(v0, sigv, omegas=[1, 0, 0])
+            mock.Cluster(v0, sigv, omegas=[1, 0, 0])
         
         with pytest.raises(ValueError) as e:
-            cl = mock.Cluster(v0, sigv, b0=[0,0,0], omegas=[1,0,0], T=np.eye(3))
+            mock.Cluster(v0, sigv, b0=[0,0,0], omegas=[1,0,0], T=np.eye(3))
         assert e.value.args[0] == "Either set (omegas, ws, k) or matrix `T`; do not set both."
 
+        # Give wrong-shape parameters.
         with pytest.raises(AssertionError):
-            cl = mock.Cluster(v0, sigv, b0=[0,0,0], omegas=[1,0,0,0])
+            mock.Cluster(v0, sigv, b0=[0,0,0], T=[1,0,0,0])
         with pytest.raises(AssertionError):
-            cl = mock.Cluster(v0, sigv, b0=[0,0,0], ws=[1,0,0,0])
+            mock.Cluster(v0, sigv, b0=[0,0,0], omegas=[1,0,0,0])
+        with pytest.raises(AssertionError):
+            mock.Cluster(v0, sigv, b0=[0,0,0], ws=[1,0,0,0])
 
     def test_sample_at(self):
         v0, sigv, N = [-6.3, 45.2, 5.3], 2.5, 1000
