@@ -1,0 +1,3 @@
+[run]
+source = kinesis/
+omit = kinesis/tests/*
