@@ -3,6 +3,7 @@ on:
   push:
     paths:
     - 'kinesis/**/*.py'
+    - .workflows/*
 
 jobs:
   run:
