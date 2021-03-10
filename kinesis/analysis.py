@@ -1,5 +1,5 @@
 """
-Routines to assist fitting results
+Routines to assist analysis of fitting results
 """
 import numpy as np
 import matplotlib.pyplot as plt
@@ -21,6 +21,54 @@ __all__ = [
     "get_flat2d",
     "compare_param",
 ]
+
+
+def calculate_rv_residual(stanfit):
+    """Calculate (rv_data - rv_model) / sqrt(rv_error^2 + sigv_model^2)
+
+    Returns:
+        res: 2d-array of (n_posterior_samples, n_rv_sources).
+
+    Sliced in axis=0, they should be distributed as Normal(0, 1).
+    """
+    res = (stanfit.data["rv"][None, :] - stanfit["rv_model"]) / np.hypot(
+        stanfit.data["rv_error"][None, :], stanfit["sigv"][:, None]
+    )
+    return res
+
+
+def calculate_veca_residual(stanfit):
+    """Calculate (a_data - a_model)^T * D * (a_data - a_model)
+
+    where D is covariance matrix of observed errors + sigv.
+
+    Returns:
+        g: 2d array, (n_samples, n_sources)
+
+    Sliced in axis=0, they should be distributed as chi2(df=3).
+    """
+    fit = stanfit
+    n_samples = fit["sigv"].shape[0]
+    delta_a = fit.data["a"][None, :] - fit["a_model"]
+    D = np.repeat(fit.data["C"].copy()[None], n_samples, axis=0)
+    D[:, :, 1, 1] += (fit["sigv"] ** 2)[:, None] / (fit["d"] / 1e3) ** 2 / 4.74 ** 2
+    D[:, :, 2, 2] += (fit["sigv"] ** 2)[:, None] / (fit["d"] / 1e3) ** 2 / 4.74 ** 2
+    Dinv = np.linalg.inv(D)
+    g = np.einsum("sni,snij,snj->sn", delta_a, Dinv, delta_a)
+    return g
+
+
+def plot_ppc_rv(stanfit):
+    import seaborn as sns
+    import matplotlib.pyplot as plt
+    import scipy as sp
+
+    rv_res = Fitter.calculate_rv_residual(stanfit)
+    for slc in rv_res:
+        sns.distplot(slc, hist=False, kde_kws={"lw": 0.5})
+    x = np.linspace(-5, 5, 51)
+    plt.plot(x, sp.stats.norm.pdf(x), "k-")
+    return plt.gcf()
 
 
 def decompose_T(T):

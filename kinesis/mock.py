@@ -143,7 +143,7 @@ class Cluster(object):
         )
         return cc_icrs
 
-    def __repr__(self):
+    def __repr__(self): # pragma: no cover
         with np.printoptions(precision=3):
             s = "Cluster(b0={b0}, v0={v0}, sigmav={sigmav})".format(
                 b0=np.array(self.b0), v0=np.array(self.v0), sigmav=self.sigmav
