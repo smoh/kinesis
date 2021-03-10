@@ -1,3 +1,5 @@
+# system stuff
+.directory
 # project stuff:
 data/
 report/
