@@ -165,7 +165,7 @@ class Cluster(object):
             raise ValueError("`coord` must be an astropy coordinate instance.")
         if cluster_coord.shape:
             raise ValueError("`coord` must be a single cluster coordinate.")
-        cluster_coord = cluster_coord.transform_to(coord.ICRS)
+        cluster_coord = cluster_coord.transform_to(coord.ICRS())
 
         b0 = cluster_coord.cartesian.xyz.to("pc").value
         v0 = cluster_coord.cartesian.differentials["s"].d_xyz.to(u.km / u.s).value
@@ -200,7 +200,7 @@ class Cluster(object):
         if not isinstance(positions, coord.BaseCoordinateFrame):
             raise ValueError("`positions` should be astropy coordinates")
         N = len(positions)
-        icrs = positions.transform_to(coord.ICRS)
+        icrs = positions.transform_to(coord.ICRS())
         bi = icrs.cartesian.xyz.to(u.pc).value
         assert bi.shape == (3, N), "WTF"
         if self.b0 is not None:

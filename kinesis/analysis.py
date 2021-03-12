@@ -117,7 +117,7 @@ def rotate_T_to_galactic(T):
             [0, 0, 1],
             representation_type=coord.CartesianRepresentation,
         )
-        .transform_to(coord.Galactic)
+        .transform_to(coord.Galactic())
         .cartesian.xyz.value
     )
     rotated_T = np.einsum("ij,...jk,kl->...il", rotmat, T, rotmat.T)
