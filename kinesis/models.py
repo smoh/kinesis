@@ -122,6 +122,7 @@ class AllCombined(KinesisModelBase):
         "a_model",
         "rv_model",
         "Omega",
+        "probmem"
     ]
     required_columns = [
         "ra",
