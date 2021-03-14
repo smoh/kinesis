@@ -25,6 +25,6 @@ I would generally recommend a sensible latest release of astropy as it is now on
 
 Finally, we will use `arviz`_ for analyzing the fits.
 
-.. _pystan: https://pystan2.readthedocs.io/
+.. _pystan2: https://pystan2.readthedocs.io/
 .. _astropy: http://astropy.org
 .. _arviz: https://arviz-devs.github.io/arviz/
