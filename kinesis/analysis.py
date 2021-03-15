@@ -6,9 +6,11 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Ellipse
 import matplotlib.transforms as transforms
 import seaborn as sns
+import arviz as az
 
 
 __all__ = [
+    "to_azfit",
     "decompose_T",
     "rotate_T_to_galactic",
     "EigenvalueDecomposition",
@@ -21,6 +23,25 @@ __all__ = [
     "get_flat2d",
     "compare_param",
 ]
+
+
+def to_azfit(stanfit):
+    """Convert stanfit to arviz InferenceData"""
+    azkwargs = {
+        "coords": {"axis": ["x", "y", "z"]},
+        "dims": {
+            "v0": ["axis"],
+            "a_hat": ["star", "axis"],
+            "log_likelihood": ["star"],
+            "a": ["star", "axis"],
+        },
+        "observed_data": ["a", "rv"],
+    }
+    azfit = az.from_pystan(stanfit, **azkwargs)
+    if "T_param" in azfit.posterior.keys():
+        for k, v in decompose_T(azfit.posterior.T_param).items():
+            azfit.posterior[k] = v
+    return azfit
 
 
 def calculate_rv_residual(stanfit):

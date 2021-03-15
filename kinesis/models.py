@@ -122,7 +122,7 @@ class AllCombined(KinesisModelBase):
         "a_model",
         "rv_model",
         "Omega",
-        "probmem"
+        "probmem",
     ]
     required_columns = [
         "ra",
@@ -382,50 +382,6 @@ class AllCombinedNoT(KinesisModelBase):
 # sns.distplot(g[:,187], hist=False, kde_kws={'lw':2});
 
 
-class FitResult(object):
-    """Fit result object to facilitate converting and saving data structure
-
-    Attributes:
-        stanfit (StanFit4Model): stan fit result
-        azfit (arviz.InferenceData): fit result for arviz plotting
-    """
-
-    def __init__(self, stanfit):
-        self.stanfit = stanfit
-        self.azfit = FitResult.to_azfit(stanfit)
-
-    @staticmethod
-    def to_azfit(stanfit):
-        """Convert stanfit to arviz InferenceData"""
-        azkwargs = {
-            "coords": {"axis": ["x", "y", "z"]},
-            "dims": {
-                "v0": ["axis"],
-                "a_hat": ["star", "axis"],
-                "log_likelihood": ["star"],
-                "a": ["star", "axis"],
-            },
-            "observed_data": ["a", "rv"],
-        }
-        azfit = az.from_pystan(stanfit, **azkwargs)
-        if "T_param" in azfit.posterior.keys():
-            for k, v in decompose_T(azfit.posterior.T_param).items():
-                azfit.posterior[k] = v
-        return azfit
-
-    def save(self, filename):
-        stanfit = self.stanfit
-        model = stanfit.stanmodel
-        with open(filename, "wb") as f:
-            pickle.dump((model, stanfit), f, protocol=-1)
-
-    @classmethod
-    def from_pickle(cls, filename):
-        with open(filename, "rb") as f:
-            model, stanfit = pickle.load(f)
-        return cls(stanfit)
-
-
 class AnisotropicDisperion(object):
     """class to facilitate cluster fitting
 
@@ -543,7 +499,6 @@ class AnisotropicDisperion(object):
         if sample:
             pars = kwargs.pop("pars", self._pars)
             stanfit = self.model.sampling(data=data, init=init, pars=pars, **kwargs)
-            # return FitResult(stanfit)
             return stanfit
         else:
             return self.model.optimizing(data=data, init=init, **kwargs)
