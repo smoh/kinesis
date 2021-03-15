@@ -8,6 +8,8 @@ mnras/
 dask-worker-space
 scratch/
 *.pickle
+# local conda env records
+nitro*.yml
 
 .idea/
 
