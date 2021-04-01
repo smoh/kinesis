@@ -7,6 +7,7 @@ from matplotlib.patches import Ellipse
 import matplotlib.transforms as transforms
 import seaborn as sns
 import arviz as az
+import astropy.coordinates as coord
 
 
 __all__ = [
@@ -31,9 +32,9 @@ def to_azfit(stanfit):
         "coords": {"axis": ["x", "y", "z"]},
         "dims": {
             "v0": ["axis"],
-            "a_hat": ["star", "axis"],
-            "log_likelihood": ["star"],
-            "a": ["star", "axis"],
+            # "a_hat": ["star", "axis"],
+            # "log_likelihood": ["star"],
+            # "a": ["star", "axis"],
         },
         "observed_data": ["a", "rv"],
     }
