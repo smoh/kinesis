@@ -4,7 +4,7 @@ import pathlib
 import logging
 import pickle
 import numpy as np
-import pystan
+import stan
 import arviz as az
 
 from kinesis.analysis import decompose_T
@@ -15,7 +15,7 @@ ROOT = os.path.abspath(os.path.dirname(__file__))
 STANDIR = os.path.join(ROOT, "stan")
 
 
-__all__ = ["get_model", "IsotropicPM", "AllCombined"]
+__all__ = ["get_model_code", "IsotropicPM", "AllCombined"]
 
 available = [
     os.path.basename(str(path)).split(".")[0]
@@ -31,25 +31,17 @@ def model_cache_path(model_name):
     return os.path.join(ROOT, "stan", model_name + ".pkl")
 
 
-def get_model(model_name, recompile=False):
+def get_model_code(model_name):
     """Get compiled StanModel
     This will compile the stan model if a cached pickle does not exist.
 
     Args:
         model_name (str): model name without `.stan`
-        recompile (bool): Force force recompilation.
     """
     model_file = model_path(model_name)
-    cache_file = model_cache_path(model_name)
-    if (not os.path.exists(cache_file)) or recompile:
-        model = pystan.StanModel(file=model_file)
-        logger.info("Compiling {:s}".format(model_name))
-        with open(cache_file, "wb") as f:
-            pickle.dump(model, f)
-    else:
-        logger.info("Reading model from disk")
-        model = pickle.load(open(cache_file, "rb"))
-    return model
+    with open(model_file) as f:
+        model_code = f.read()
+    return model_code
 
 
 class KinesisModelBase(ABC):
@@ -58,7 +50,7 @@ class KinesisModelBase(ABC):
     model_name = None
     _additional_data_required = None
 
-    def __init__(self, recompile=False):
+    def __init__(self):
         """Load/Compile StanModel to memory.
 
         Args:
@@ -68,7 +60,7 @@ class KinesisModelBase(ABC):
             include_T :(bool): True if linear velocity gradient is included in the model.
             model (StanModel): compiled stan model
         """
-        self.model = get_model(self.model_name, recompile=recompile)
+        self._model_code = get_model_code(self.model_name)
 
     def validate_dataframe(self, df):
         """Validate that the dataframe has required columns
@@ -91,23 +83,30 @@ class KinesisModelBase(ABC):
     def _default_init(self, df):
         pass
 
-    def fit(self, df, sample=True, **kwargs):
+    def fit(self, df, b0=None, num_chains=4, **sample_kw):
 
-        if "data" in kwargs:
-            raise ValueError("`data` should be specified as pandas.DataFrame.")
+        # if "data" in kwargs:
+        #     raise ValueError("`data` should be specified as pandas.DataFrame.")
         self.validate_dataframe(df)
         data = self._prepare_standata(df)
-        if "b0" in kwargs:
-            data["b0"] = kwargs.pop("b0")
+        if "b0":
+            data["b0"] = b0
 
-        init = kwargs.pop("init", self._default_init(data))
+        initfunc = sample_kw.pop("init", self._default_init(data))
 
-        if sample:
-            pars = kwargs.pop("pars", self.pars_to_query)
-            stanfit = self.model.sampling(data=data, init=init, pars=pars, **kwargs)
-            return stanfit
-        else:
-            return self.model.optimizing(data=data, init=init, **kwargs)
+        # python3 does not know how to encode np.ndarray
+        def convert_types(d):
+            for k, v in d.items():
+                if isinstance(v, np.ndarray):
+                    d[k] = v.tolist()
+            return d
+
+        init = [convert_types(initfunc()) for i in range(num_chains)]
+
+        # pars = sample_kw.pop("pars", self.pars_to_query)
+        self.posterior = stan.build(self._model_code, data)
+        stanfit = self.posterior.sample(init=init, **sample_kw)
+        return stanfit
 
 
 class AllCombined(KinesisModelBase):
