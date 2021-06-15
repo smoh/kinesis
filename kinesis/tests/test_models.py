@@ -4,7 +4,7 @@
 import numpy as np
 import pandas as pd
 import kinesis as kn
-import gapipes
+import pystan
 
 np.random.seed(73929)
 
@@ -31,7 +31,7 @@ def test_model():
         .observe(cov=np.eye(3) * 0.01, rv_error=np.ones(Nbg))
     )
     df = pd.concat((cl.members.observed, bg.members.observed), axis=0)
-    m = kn.AllCombined()
+    m = kn.AllCombined(recompile=True)
 
     def initfunc():
         return dict(
