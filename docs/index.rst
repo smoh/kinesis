@@ -15,6 +15,7 @@ It also has utilities to generate mock clusters and mock observations.
    :maxdepth: 2
 
    install
+   tutorial-mock
    tutorial
    models
    api
