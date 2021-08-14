@@ -1,0 +1,1770 @@
+<!doctype html>
+<html class="no-js">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Available models" href="models.html" /><link rel="prev" title="Making a mock cluster" href="tutorial-mock.html" />
+
+    <meta name="generator" content="sphinx-4.1.2, furo 2021.08.11.beta42"/>
+        <title>Getting started with Kinesis - kinesis documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=197f00461d56902ea7ca048ec6e6ba026f62c97b" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=93475b62d1c3bc01323a0eefdc14a62d77b12690" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  body[data-theme="dark"] {
+    --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+  }
+  @media (prefers-color-scheme: dark) {
+    body:not([data-theme="light"]) {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+  }
+</style>
+    <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="_static/pygments_dark.css"></head>
+  <body>
+    
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" />
+      <line x1="4" y1="6" x2="20" y2="6" />
+      <line x1="10" y1="12" x2="20" y2="12" />
+      <line x1="6" y1="18" x2="20" y2="18" />
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">kinesis  documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  
+  <span class="sidebar-brand-text">kinesis  documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installing kinesis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial-mock.html">Making a mock cluster</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Getting started with Kinesis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Available models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a></li>
+</ul>
+
+</div>
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <article role="main">
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<section id="Getting-started-with-Kinesis">
+<h1>Getting started with Kinesis<a class="headerlink" href="#Getting-started-with-Kinesis" title="Permalink to this headline">¶</a></h1>
+<p>In this notebook, we will generate a mock cluster, observe (add noise) and fit to see if we recover the true parameters of its internal kinematics.</p>
+<p>Notes on dependences - <a class="reference external" href="https://github.com/smoh/gapipes">gapipes</a>: for custom pandas accessor <code class="docutils literal notranslate"><span class="pre">g</span></code> to get covariance matrices, astropy coordinate objects.. - <a class="reference external" href="https://github.com/arviz-devs/arviz">arviz</a>: for visualization</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">colors</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">astropy.units</span> <span class="k">as</span> <span class="nn">u</span>
+<span class="kn">import</span> <span class="nn">astropy.coordinates</span> <span class="k">as</span> <span class="nn">coords</span>
+<span class="kn">import</span> <span class="nn">arviz</span> <span class="k">as</span> <span class="nn">az</span>
+
+<span class="c1"># project dependencies</span>
+<span class="kn">import</span> <span class="nn">gapipes</span> <span class="k">as</span> <span class="nn">gp</span>
+<span class="kn">import</span> <span class="nn">kinesis</span> <span class="k">as</span> <span class="nn">kn</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">18324</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<section id="Making-and-observing-a-mock-cluster">
+<h2>Making and observing a mock cluster<a class="headerlink" href="#Making-and-observing-a-mock-cluster" title="Permalink to this headline">¶</a></h2>
+<p>First, let’s make a cluster with some fiducial parameters.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">N</span> <span class="o">=</span> <span class="mi">150</span>  <span class="c1"># number of sources</span>
+<span class="n">b0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">17.7</span><span class="p">,</span> <span class="mf">41.2</span><span class="p">,</span> <span class="mf">13.3</span><span class="p">])</span>    <span class="c1"># pc</span>
+<span class="n">v0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">6.32</span><span class="p">,</span> <span class="mf">45.24</span><span class="p">,</span> <span class="mf">5.30</span><span class="p">])</span>  <span class="c1"># [vx, vy, vz] in km/s</span>
+<span class="n">sigv</span> <span class="o">=</span> <span class="mf">1.</span>  <span class="c1"># dispersion, km/s</span>
+
+<span class="n">cl</span> <span class="o">=</span> <span class="n">kn</span><span class="o">.</span><span class="n">Cluster</span><span class="p">(</span><span class="n">v0</span><span class="p">,</span> <span class="n">sigv</span><span class="p">,</span> <span class="n">b0</span><span class="o">=</span><span class="n">b0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>The cluster currently has no members. We need to ‘sample’ the cluster in order to populate it. There are two methods for sampling a cluster: - sample_sphere: sampling uniformly within a maximum radius - sample_at: sample at exactly the positions you want by giving it astropy coordinates.</p>
+<p>Let’s do uniform sphere for now. All normal methods of <code class="docutils literal notranslate"><span class="pre">Cluster</span></code> will return itself with modified attributes for method chaining. Sampling will modify its <code class="docutils literal notranslate"><span class="pre">members</span></code> from <code class="docutils literal notranslate"><span class="pre">None</span></code> to an instance of <code class="docutils literal notranslate"><span class="pre">ClusterMembers</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">cl</span><span class="o">.</span><span class="n">sample_sphere</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="n">Rmax</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">cl</span><span class="o">.</span><span class="n">members</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;kinesis.mock.ClusterMembers at 0x7ff1b8b9bc50&gt;
+</pre></div></div>
+</div>
+<p>There are two Gaia-like DataFrame associated with <code class="docutils literal notranslate"><span class="pre">ClusterMembers</span></code>: - <code class="docutils literal notranslate"><span class="pre">truths</span></code>: this is the noise-free Gaia data consistent with the <code class="docutils literal notranslate"><span class="pre">Cluster</span></code>’s internal motions - <code class="docutils literal notranslate"><span class="pre">observed</span></code>: this is the noise-added Gaia data. If the <code class="docutils literal notranslate"><span class="pre">ClusterMembers</span></code> has not been <code class="docutils literal notranslate"><span class="pre">observe</span></code>d, it will be <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+<p>Now let’s <code class="docutils literal notranslate"><span class="pre">observe</span></code> the cluster. In order to observe, you need to specify the 3x3 covariance matrix for (parallax, pmra, pmdec) with <code class="docutils literal notranslate"><span class="pre">cov</span></code> keyword. If <code class="docutils literal notranslate"><span class="pre">cov</span></code> is (3,3) array, this will be assumed for all stars. You can also specify different covariance matrix for different stars by specifying <code class="docutils literal notranslate"><span class="pre">cov</span></code> to be (N, 3, 3) array. The noise model is assumed to be Gaussian.</p>
+<p>It is also possible to specify covariance by giving another Gaia-like data frame using <code class="docutils literal notranslate"><span class="pre">error_from</span></code> keyword. The following columns needed to construct to covariance matrix are expected: <code class="docutils literal notranslate"><span class="pre">parallax_error</span></code>, <code class="docutils literal notranslate"><span class="pre">pmra_error</span></code>, <code class="docutils literal notranslate"><span class="pre">pmdec_error</span></code>, <code class="docutils literal notranslate"><span class="pre">parallax_pmra_corr</span></code>, <code class="docutils literal notranslate"><span class="pre">parallax_pmdec_corr</span></code>, <code class="docutils literal notranslate"><span class="pre">pmra_pmdec_corr</span></code>. This is useful, for example, if you want to simulate data as noisy as the actual Gaia data you want to model.</p>
+<p>Radial velocity errors should be specified separately with <code class="docutils literal notranslate"><span class="pre">rv_error</span></code> keyword, which should be 1-d array with <code class="docutils literal notranslate"><span class="pre">N</span></code> elements, each specifying the Gaussian standard deviation in km/s. If any element in <code class="docutils literal notranslate"><span class="pre">rv_error</span></code> is <code class="docutils literal notranslate"><span class="pre">np.nan</span></code>, it is assumed that the star does not have RV measurement.</p>
+<p>This will add noise to the astrometry and radial velocities of the cluster members, and the noise-added Gaia-like data frame is now accessible with <code class="docutils literal notranslate"><span class="pre">cl.members.observed</span></code>.</p>
+<p>Let’s specify simply 0.01 mas or mas/yr errors for parallax and pmra/pmdec and no available RVs.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">cl</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">cov</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="mf">0.01</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Cluster(b0=[17.7 41.2 13.3], v0=[-6.32 45.24  5.3 ], sigmav=1.0)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">cl</span><span class="o">.</span><span class="n">members</span><span class="o">.</span><span class="n">observed</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<div class="table-wrapper"><table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>ra</th>
+<th>dec</th>
+<th>parallax</th>
+<th>pmra</th>
+<th>pmdec</th>
+<th>parallax_pmra_corr</th>
+<th>parallax_pmdec_corr</th>
+<th>pmra_pmdec_corr</th>
+<th>parallax_error</th>
+<th>pmra_error</th>
+<th>pmdec_error</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>69.827908</td>
+<td>15.519434</td>
+<td>21.658627</td>
+<td>100.052890</td>
+<td>-26.044631</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.1</td>
+<td>0.1</td>
+<td>0.1</td>
+</tr>
+<tr>
+<th>1</th>
+<td>63.449065</td>
+<td>18.338080</td>
+<td>20.766187</td>
+<td>116.685278</td>
+<td>-26.140222</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.1</td>
+<td>0.1</td>
+<td>0.1</td>
+</tr>
+<tr>
+<th>2</th>
+<td>67.364160</td>
+<td>20.868653</td>
+<td>21.499381</td>
+<td>97.637078</td>
+<td>-44.203983</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.1</td>
+<td>0.1</td>
+<td>0.1</td>
+</tr>
+<tr>
+<th>3</th>
+<td>62.220135</td>
+<td>16.061914</td>
+<td>20.091140</td>
+<td>116.236887</td>
+<td>-26.155718</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.1</td>
+<td>0.1</td>
+<td>0.1</td>
+</tr>
+<tr>
+<th>4</th>
+<td>61.149763</td>
+<td>17.653502</td>
+<td>22.460105</td>
+<td>124.989805</td>
+<td>-28.335939</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.1</td>
+<td>0.1</td>
+<td>0.1</td>
+</tr>
+</tbody>
+</table></div>
+</div></div>
+</div>
+</section>
+<section id="Fitting-the-mock-data">
+<h2>Fitting the mock data<a class="headerlink" href="#Fitting-the-mock-data" title="Permalink to this headline">¶</a></h2>
+<p>Now let’s try to fit the mock data that we generated. Under the hood, kinesis uses <a class="reference external" href="https://mc-stan.org/">stan</a> using its python interface <a class="reference external" href="https://pystan.readthedocs.io/en/latest/">pystan</a>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">fitter</span> <span class="o">=</span> <span class="n">kn</span><span class="o">.</span><span class="n">Fitter</span><span class="p">(</span><span class="n">include_T</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">recompile</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+INFO:pystan:COMPILING THE C++ CODE FOR MODEL anon_model_47c60c044460f8a93fb3bb3ea5a6ba35 NOW.
+INFO:kinesis.models:Compiling general_model
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">df</span> <span class="o">=</span> <span class="n">cl</span><span class="o">.</span><span class="n">members</span><span class="o">.</span><span class="n">observed</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">fit</span> <span class="o">=</span> <span class="n">fitter</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"v0, sigv = </span><span class="si">{</span><span class="n">fit</span><span class="p">[</span><span class="s1">'v0'</span><span class="p">]</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">fit</span><span class="p">[</span><span class="s1">'sigv'</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"diff from truth: </span><span class="si">{</span><span class="n">fit</span><span class="p">[</span><span class="s1">'v0'</span><span class="p">]</span><span class="o">-</span><span class="n">v0</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">fit</span><span class="p">[</span><span class="s1">'sigv'</span><span class="p">]</span><span class="o">-</span><span class="n">sigv</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+v0, sigv = [-6.0485426  45.77930913  5.55432163], 0.9072
+diff from truth: [0.2714574  0.53930913 0.25432163], -0.0928
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">stanfit</span> <span class="o">=</span> <span class="n">fitter</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">stanfit</span><span class="o">.</span><span class="n">azfit</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Inference data with groups:
+        &gt; posterior
+        &gt; sample_stats
+        &gt; observed_data
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">azfit</span><span class="o">=</span><span class="n">stanfit</span><span class="o">.</span><span class="n">azfit</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">az</span><span class="o">.</span><span class="n">summary</span><span class="p">(</span><span class="n">azfit</span><span class="p">,</span> <span class="n">var_names</span><span class="o">=</span><span class="p">[</span><span class="s1">'v0'</span><span class="p">,</span><span class="s1">'sigv'</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<div class="table-wrapper"><table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>mean</th>
+<th>sd</th>
+<th>hpd_3%</th>
+<th>hpd_97%</th>
+<th>mcse_mean</th>
+<th>mcse_sd</th>
+<th>ess_mean</th>
+<th>ess_sd</th>
+<th>ess_bulk</th>
+<th>ess_tail</th>
+<th>r_hat</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>v0[0]</th>
+<td>-6.060</td>
+<td>0.434</td>
+<td>-6.856</td>
+<td>-5.228</td>
+<td>0.011</td>
+<td>0.008</td>
+<td>1615.0</td>
+<td>1607.0</td>
+<td>1625.0</td>
+<td>2122.0</td>
+<td>1.0</td>
+</tr>
+<tr>
+<th>v0[1]</th>
+<td>45.754</td>
+<td>1.000</td>
+<td>43.927</td>
+<td>47.715</td>
+<td>0.025</td>
+<td>0.018</td>
+<td>1632.0</td>
+<td>1632.0</td>
+<td>1640.0</td>
+<td>2098.0</td>
+<td>1.0</td>
+</tr>
+<tr>
+<th>v0[2]</th>
+<td>5.546</td>
+<td>0.328</td>
+<td>4.920</td>
+<td>6.143</td>
+<td>0.008</td>
+<td>0.006</td>
+<td>1649.0</td>
+<td>1649.0</td>
+<td>1653.0</td>
+<td>1991.0</td>
+<td>1.0</td>
+</tr>
+<tr>
+<th>sigv</th>
+<td>0.919</td>
+<td>0.037</td>
+<td>0.850</td>
+<td>0.990</td>
+<td>0.001</td>
+<td>0.000</td>
+<td>5188.0</td>
+<td>5174.0</td>
+<td>5183.0</td>
+<td>3203.0</td>
+<td>1.0</td>
+</tr>
+</tbody>
+</table></div>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">az</span><span class="o">.</span><span class="n">plot_forest</span><span class="p">(</span><span class="n">azfit</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">'ridgeplot'</span><span class="p">,</span> <span class="n">var_names</span><span class="o">=</span><span class="p">[</span><span class="s1">'sigv'</span><span class="p">]);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/tutorial_18_0.png" src="_images/tutorial_18_0.png"/>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">az</span><span class="o">.</span><span class="n">plot_pair</span><span class="p">(</span><span class="n">azfit</span><span class="p">,</span> <span class="n">var_names</span><span class="o">=</span><span class="p">[</span><span class="s1">'v0'</span><span class="p">,</span><span class="s1">'sigv'</span><span class="p">]);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/tutorial_19_0.png" src="_images/tutorial_19_0.png"/>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">v0_diff</span> <span class="o">=</span> <span class="n">stanfit</span><span class="p">[</span><span class="s1">'v0'</span><span class="p">]</span> <span class="o">-</span> <span class="n">cl</span><span class="o">.</span><span class="n">v0</span><span class="p">[</span><span class="kc">None</span><span class="p">,:]</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">v0_diff</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">histtype</span><span class="o">=</span><span class="s1">'step'</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="p">[</span><span class="s1">'x'</span><span class="p">,</span><span class="s1">'y'</span><span class="p">,</span><span class="s1">'z'</span><span class="p">]);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"diff from truth [km/s]"</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">'upper left'</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">'gray'</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">.5</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/tutorial_20_0.png" src="_images/tutorial_20_0.png"/>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">az</span><span class="o">.</span><span class="n">plot_posterior</span><span class="p">(</span><span class="n">azfit</span><span class="p">,</span> <span class="n">var_names</span><span class="o">=</span><span class="p">[</span><span class="s1">'sigv'</span><span class="p">],</span> <span class="n">ref_val</span><span class="o">=</span><span class="n">cl</span><span class="o">.</span><span class="n">sigmav</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">3</span><span class="p">));</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/tutorial_21_0.png" src="_images/tutorial_21_0.png"/>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># plt.figure(figsize=(4,3))</span>
+<span class="c1"># g = np.einsum('ni,nij,nj-&gt;n', a-r['a_model'], np.linalg.inv(C), a-r['a_model'])</span>
+
+<span class="c1"># plt.hist(g, 32, density=True);</span>
+<span class="c1"># plt.hist(g, np.logspace(0, 4, 32), density=True);</span>
+<span class="c1"># plt.xscale('log');</span>
+<span class="c1"># plt.yscale('log')</span>
+</pre></div>
+</div>
+</div>
+<section id="Basic-cluster-model-with-partial-RVs">
+<h3>Basic cluster model with partial RVs<a class="headerlink" href="#Basic-cluster-model-with-partial-RVs" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">N</span> <span class="o">=</span> <span class="mi">150</span>
+<span class="n">b0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">17.7</span><span class="p">,</span> <span class="mf">41.2</span><span class="p">,</span> <span class="mf">13.3</span><span class="p">])</span>    <span class="c1"># pc</span>
+<span class="n">v0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">6.32</span><span class="p">,</span> <span class="mf">45.24</span><span class="p">,</span> <span class="mf">5.30</span><span class="p">])</span>
+<span class="n">sigv</span> <span class="o">=</span> <span class="mf">1.</span>
+
+<span class="n">cl</span> <span class="o">=</span> <span class="n">kn</span><span class="o">.</span><span class="n">Cluster</span><span class="p">(</span><span class="n">v0</span><span class="p">,</span> <span class="n">sigv</span><span class="p">,</span> <span class="n">b0</span><span class="o">=</span><span class="n">b0</span><span class="p">)</span>\
+       <span class="o">.</span><span class="n">sample_sphere</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="n">Rmax</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>\
+       <span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">cov</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="mf">0.01</span><span class="p">)</span>
+
+<span class="c1"># Give random half of the stars RV with 0.5 km/s uncertainty</span>
+<span class="n">Nrv</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">N</span><span class="o">*</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">rv_error</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="n">irand</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="n">Nrv</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">cl</span><span class="o">.</span><span class="n">members</span><span class="o">.</span><span class="n">observed</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">'radial_velocity'</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">cl</span><span class="o">.</span><span class="n">members</span><span class="o">.</span><span class="n">truth</span><span class="p">[</span><span class="s1">'radial_velocity'</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">rv_error</span><span class="p">)</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">'radial_velocity_error'</span><span class="p">]</span> <span class="o">=</span> <span class="n">rv_error</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">df</span> <span class="o">=</span> <span class="n">cl</span><span class="o">.</span><span class="n">members</span><span class="o">.</span><span class="n">observed</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">fit</span> <span class="o">=</span> <span class="n">fitter</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"v0, sigv = </span><span class="si">{</span><span class="n">fit</span><span class="p">[</span><span class="s1">'v0'</span><span class="p">]</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">fit</span><span class="p">[</span><span class="s1">'sigv'</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"diff from truth: </span><span class="si">{</span><span class="n">fit</span><span class="p">[</span><span class="s1">'v0'</span><span class="p">]</span><span class="o">-</span><span class="n">v0</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">fit</span><span class="p">[</span><span class="s1">'sigv'</span><span class="p">]</span><span class="o">-</span><span class="n">sigv</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+v0, sigv = [-5.92897309 46.06913061  5.49316135], 0.9835
+diff from truth: [0.39102691 0.82913061 0.19316135], -0.0165
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">stanfit_partialrv</span> <span class="o">=</span> <span class="n">fitter</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># workaround for a bug in arviz instantiating InferenceData</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">stanfit_partialrv</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">permuted</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">pars</span><span class="o">=</span><span class="p">[</span><span class="s1">'v0'</span><span class="p">,</span> <span class="s1">'sigv'</span><span class="p">])</span>
+<span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+<span class="n">azfit_partialrv</span> <span class="o">=</span> <span class="n">az</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">v0_diff0</span> <span class="o">=</span> <span class="n">stanfit</span><span class="p">[</span><span class="s1">'v0'</span><span class="p">]</span> <span class="o">-</span> <span class="n">cl</span><span class="o">.</span><span class="n">v0</span><span class="p">[</span><span class="kc">None</span><span class="p">,:]</span>
+<span class="n">v0_diff</span> <span class="o">=</span> <span class="n">stanfit_partialrv</span><span class="p">[</span><span class="s1">'v0'</span><span class="p">]</span> <span class="o">-</span> <span class="n">cl</span><span class="o">.</span><span class="n">v0</span><span class="p">[</span><span class="kc">None</span><span class="p">,:]</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">color</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'tab:blue'</span><span class="p">,</span> <span class="s1">'tab:green'</span><span class="p">,</span> <span class="s1">'tab:orange'</span><span class="p">]</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">v0_diff0</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">histtype</span><span class="o">=</span><span class="s1">'step'</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">.5</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">v0_diff</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">histtype</span><span class="o">=</span><span class="s1">'step'</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="p">[</span><span class="s1">'x'</span><span class="p">,</span><span class="s1">'y'</span><span class="p">,</span><span class="s1">'z'</span><span class="p">],</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"diff from truth [km/s]"</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">'upper left'</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">'gray'</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">.5</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/tutorial_28_0.png" src="_images/tutorial_28_0.png"/>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">axs</span> <span class="o">=</span> <span class="n">az</span><span class="o">.</span><span class="n">plot_posterior</span><span class="p">(</span><span class="n">azfit</span><span class="p">,</span> <span class="n">var_names</span><span class="o">=</span><span class="p">[</span><span class="s1">'sigv'</span><span class="p">],</span> <span class="n">ref_val</span><span class="o">=</span><span class="n">cl</span><span class="o">.</span><span class="n">sigmav</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">az</span><span class="o">.</span><span class="n">plot_posterior</span><span class="p">(</span><span class="n">azfit_partialrv</span><span class="p">,</span> <span class="n">var_names</span><span class="o">=</span><span class="p">[</span><span class="s1">'sigv'</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/tutorial_29_0.png" src="_images/tutorial_29_0.png"/>
+</div>
+</div>
+</section>
+</section>
+<section id="Cluster-with-rotation">
+<h2>Cluster with rotation<a class="headerlink" href="#Cluster-with-rotation" title="Permalink to this headline">¶</a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">N</span> <span class="o">=</span> <span class="mi">150</span>
+<span class="n">b0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">17.7</span><span class="p">,</span> <span class="mf">41.2</span><span class="p">,</span> <span class="mf">13.3</span><span class="p">])</span>    <span class="c1"># pc</span>
+<span class="n">v0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">6.32</span><span class="p">,</span> <span class="mf">45.24</span><span class="p">,</span> <span class="mf">5.30</span><span class="p">])</span>
+<span class="n">sigv</span> <span class="o">=</span> <span class="mf">1.</span>
+<span class="n">omegas</span> <span class="o">=</span> <span class="p">[</span><span class="mf">40.</span><span class="p">,</span> <span class="mf">20.</span><span class="p">,</span> <span class="mf">50.</span><span class="p">]</span>
+
+<span class="n">cl</span> <span class="o">=</span> <span class="n">kn</span><span class="o">.</span><span class="n">Cluster</span><span class="p">(</span><span class="n">v0</span><span class="p">,</span> <span class="n">sigv</span><span class="p">,</span> <span class="n">b0</span><span class="o">=</span><span class="n">b0</span><span class="p">,</span> <span class="n">omegas</span><span class="o">=</span><span class="n">omegas</span><span class="p">)</span>\
+       <span class="o">.</span><span class="n">sample_sphere</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="n">Rmax</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>\
+       <span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">cov</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="mf">0.001</span><span class="p">)</span>
+<span class="n">cl0</span> <span class="o">=</span> <span class="n">kn</span><span class="o">.</span><span class="n">Cluster</span><span class="p">(</span><span class="n">v0</span><span class="p">,</span> <span class="n">sigv</span><span class="p">,</span> <span class="n">b0</span><span class="o">=</span><span class="n">b0</span><span class="p">)</span><span class="o">.</span><span class="n">sample_at</span><span class="p">(</span><span class="n">cl</span><span class="o">.</span><span class="n">members</span><span class="o">.</span><span class="n">truth</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">icrs</span><span class="p">)</span>
+
+<span class="c1"># Give random half of the stars RV with 0.5 km/s uncertainty</span>
+<span class="n">Nrv</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">N</span><span class="o">*</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">rv_error</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="n">irand</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="n">Nrv</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">cl</span><span class="o">.</span><span class="n">members</span><span class="o">.</span><span class="n">observed</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">'radial_velocity'</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">cl</span><span class="o">.</span><span class="n">members</span><span class="o">.</span><span class="n">truth</span><span class="p">[</span><span class="s1">'radial_velocity'</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">rv_error</span><span class="p">)</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">'radial_velocity_error'</span><span class="p">]</span> <span class="o">=</span> <span class="n">rv_error</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">m</span> <span class="o">=</span> <span class="n">kn</span><span class="o">.</span><span class="n">Fitter</span><span class="p">(</span><span class="n">include_T</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">fit</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">b0</span><span class="o">=</span><span class="n">b0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+INFO:kinesis.models:Reading model from disk
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"v0, sigv = </span><span class="si">{</span><span class="n">fit</span><span class="p">[</span><span class="s1">'v0'</span><span class="p">]</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">fit</span><span class="p">[</span><span class="s1">'sigv'</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"diff from truth: </span><span class="si">{</span><span class="n">fit</span><span class="p">[</span><span class="s1">'v0'</span><span class="p">]</span><span class="o">-</span><span class="n">v0</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">fit</span><span class="p">[</span><span class="s1">'sigv'</span><span class="p">]</span><span class="o">-</span><span class="n">sigv</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">fit</span><span class="p">[</span><span class="s1">'T_param'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">cl</span><span class="o">.</span><span class="n">T</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+v0, sigv = [-6.382561   45.25883593  5.52632739], 0.9632
+diff from truth: [-0.062561    0.01883593  0.22632739], -0.0368
+[[ -5.47942742 -48.81690422  14.15808424]
+ [ 27.02856238   6.34378433 -29.12948134]
+ [ -4.03730063  37.49138498  -3.81971577]]
+[[  0. -50.  20.]
+ [ 50.   0. -40.]
+ [-20.  40.   0.]]
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># omegax = 0.5*(r['T_param'][2, 1] - r['T_param'][1, 2])</span>
+<span class="c1"># omegay = 0.5*(r['T_param'][0, 2] - r['T_param'][2, 0])</span>
+<span class="c1"># omegaz = 0.5*(r['T_param'][1, 0] - r['T_param'][0, 1])</span>
+
+<span class="c1"># w1 = 0.5*(r['T_param'][2, 1] + r['T_param'][1, 2])</span>
+<span class="c1"># w2 = 0.5*(r['T_param'][0, 2] + r['T_param'][2, 0])</span>
+<span class="c1"># w3 = 0.5*(r['T_param'][1, 0] + r['T_param'][0, 1])</span>
+<span class="c1"># w4 = r['T_param'][0, 0]</span>
+<span class="c1"># w5 = r['T_param'][1, 1]</span>
+<span class="c1"># kappa = w4 + w5 + r['T_param'][2, 2]</span>
+<span class="c1"># print(omegax, omegay, omegaz)</span>
+<span class="c1"># print(w1, w2, w3)</span>
+<span class="c1"># print(w4, w5)</span>
+<span class="c1"># print(kappa)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">stanfit</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">b0</span><span class="o">=</span><span class="n">b0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">azfit</span> <span class="o">=</span> <span class="n">az</span><span class="o">.</span><span class="n">from_pystan</span><span class="p">(</span><span class="n">stanfit</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">v0_diff</span> <span class="o">=</span> <span class="n">stanfit</span><span class="p">[</span><span class="s1">'v0'</span><span class="p">]</span> <span class="o">-</span> <span class="n">cl</span><span class="o">.</span><span class="n">v0</span><span class="p">[</span><span class="kc">None</span><span class="p">,:]</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">color</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'tab:blue'</span><span class="p">,</span> <span class="s1">'tab:green'</span><span class="p">,</span> <span class="s1">'tab:orange'</span><span class="p">]</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">v0_diff</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">histtype</span><span class="o">=</span><span class="s1">'step'</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="p">[</span><span class="s1">'x'</span><span class="p">,</span><span class="s1">'y'</span><span class="p">,</span><span class="s1">'z'</span><span class="p">],</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"diff from truth [km/s]"</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">'upper left'</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">'gray'</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">.5</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/tutorial_37_0.png" src="_images/tutorial_37_0.png"/>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">bottom</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="mf">0.15</span><span class="p">)</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">cax</span><span class="p">,</span> <span class="n">cT</span><span class="p">,</span> <span class="n">truth</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">stanfit</span><span class="p">[</span><span class="s2">"T_param"</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">cl</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">ravel</span><span class="p">()):</span>
+    <span class="n">cax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">cT</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">histtype</span><span class="o">=</span><span class="s2">"step"</span><span class="p">)</span>
+    <span class="n">cax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">"k"</span><span class="p">)</span>
+    <span class="n">cax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">"gray"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.55</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">,</span> <span class="s2">"m/s/pc"</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">"center"</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s2">"center"</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.55</span><span class="p">,</span> <span class="s2">"Density"</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">"center"</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s2">"center"</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">"mock_posterior_T.png"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/tutorial_38_0.png" src="_images/tutorial_38_0.png"/>
+</div>
+</div>
+</section>
+<section id="Cluster-with-rotation---ideal-case">
+<h2>Cluster with rotation - ideal case<a class="headerlink" href="#Cluster-with-rotation---ideal-case" title="Permalink to this headline">¶</a></h2>
+<p>Test the most ideal case when the cluster has small dispersion and all velocities are measured to high precision.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">N</span> <span class="o">=</span> <span class="mi">150</span>
+<span class="n">b0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">17.7</span><span class="p">,</span> <span class="mf">41.2</span><span class="p">,</span> <span class="mf">13.3</span><span class="p">])</span>    <span class="c1"># pc</span>
+<span class="n">v0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">6.32</span><span class="p">,</span> <span class="mf">45.24</span><span class="p">,</span> <span class="mf">5.30</span><span class="p">])</span>
+<span class="n">sigv</span> <span class="o">=</span> <span class="mf">0.1</span> <span class="c1"># small dispersion</span>
+<span class="n">omegas</span> <span class="o">=</span> <span class="p">[</span><span class="mf">40.</span><span class="p">,</span> <span class="mf">20.</span><span class="p">,</span> <span class="mf">50.</span><span class="p">]</span>
+
+<span class="n">cl</span> <span class="o">=</span> <span class="n">kn</span><span class="o">.</span><span class="n">Cluster</span><span class="p">(</span><span class="n">v0</span><span class="p">,</span> <span class="n">sigv</span><span class="p">,</span> <span class="n">b0</span><span class="o">=</span><span class="n">b0</span><span class="p">,</span> <span class="n">omegas</span><span class="o">=</span><span class="n">omegas</span><span class="p">)</span>\
+       <span class="o">.</span><span class="n">sample_sphere</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="n">Rmax</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>\
+       <span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">cov</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="mf">0.001</span><span class="p">)</span>
+<span class="n">cl0</span> <span class="o">=</span> <span class="n">kn</span><span class="o">.</span><span class="n">Cluster</span><span class="p">(</span><span class="n">v0</span><span class="p">,</span> <span class="n">sigv</span><span class="p">,</span> <span class="n">b0</span><span class="o">=</span><span class="n">b0</span><span class="p">)</span><span class="o">.</span><span class="n">sample_at</span><span class="p">(</span><span class="n">cl</span><span class="o">.</span><span class="n">members</span><span class="o">.</span><span class="n">truth</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">icrs</span><span class="p">)</span>
+
+<span class="c1"># Give all stars observed RV with small uncertainty</span>
+<span class="n">Nrv</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+<span class="n">rv_error</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="n">irand</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="n">Nrv</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">cl</span><span class="o">.</span><span class="n">members</span><span class="o">.</span><span class="n">observed</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">'radial_velocity'</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">cl</span><span class="o">.</span><span class="n">members</span><span class="o">.</span><span class="n">truth</span><span class="p">[</span><span class="s1">'radial_velocity'</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">rv_error</span><span class="p">)</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">'radial_velocity_error'</span><span class="p">]</span> <span class="o">=</span> <span class="n">rv_error</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">m</span> <span class="o">=</span> <span class="n">kn</span><span class="o">.</span><span class="n">Fitter</span><span class="p">(</span><span class="n">include_T</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">fit</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">b0</span><span class="o">=</span><span class="n">b0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+INFO:kinesis.models:Reading model from disk
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"v0, sigv = </span><span class="si">{</span><span class="n">fit</span><span class="p">[</span><span class="s1">'v0'</span><span class="p">]</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">fit</span><span class="p">[</span><span class="s1">'sigv'</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"diff from truth: </span><span class="si">{</span><span class="n">fit</span><span class="p">[</span><span class="s1">'v0'</span><span class="p">]</span><span class="o">-</span><span class="n">v0</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">fit</span><span class="p">[</span><span class="s1">'sigv'</span><span class="p">]</span><span class="o">-</span><span class="n">sigv</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">fit</span><span class="p">[</span><span class="s1">'T_param'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">cl</span><span class="o">.</span><span class="n">T</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+v0, sigv = [-6.31158325 45.23302118  5.30911615], 0.0974
+diff from truth: [ 0.00841675 -0.00697882  0.00911615], -0.0026
+[[ -0.53514835 -49.6406874   18.48196561]
+ [ 52.87740998   3.07364283 -38.98217046]
+ [-19.87667794  42.07821215   2.22755235]]
+[[  0. -50.  20.]
+ [ 50.   0. -40.]
+ [-20.  40.   0.]]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">stanfit</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">b0</span><span class="o">=</span><span class="n">b0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+WARNING:pystan:8 of 4000 iterations saturated the maximum tree depth of 10 (0.2%)
+WARNING:pystan:Run again with max_treedepth larger than 10 to avoid saturation
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">azfit</span> <span class="o">=</span> <span class="n">az</span><span class="o">.</span><span class="n">from_pystan</span><span class="p">(</span><span class="n">stanfit</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="p">{</span><span class="s1">'x'</span><span class="p">:[</span><span class="s1">'v1'</span><span class="p">,</span><span class="s1">'v2'</span><span class="p">,</span><span class="s1">'v3'</span><span class="p">]},</span> <span class="n">dims</span><span class="o">=</span><span class="p">{</span><span class="s1">'v0'</span><span class="p">:[</span><span class="s1">'x'</span><span class="p">]})</span>
+<span class="n">azfit</span><span class="o">.</span><span class="n">posterior</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;xarray.Dataset&gt;
+Dimensions:         (T_param_dim_0: 3, T_param_dim_1: 3, a_model_dim_0: 150, a_model_dim_1: 3, chain: 4, draw: 1000, rv_model_dim_0: 150, x: 3)
+Coordinates:
+  * chain           (chain) int64 0 1 2 3
+  * draw            (draw) int64 0 1 2 3 4 5 6 7 ... 993 994 995 996 997 998 999
+  * x               (x) &lt;U2 'v1' 'v2' 'v3'
+  * a_model_dim_0   (a_model_dim_0) int64 0 1 2 3 4 5 ... 145 146 147 148 149
+  * a_model_dim_1   (a_model_dim_1) int64 0 1 2
+  * rv_model_dim_0  (rv_model_dim_0) int64 0 1 2 3 4 5 ... 145 146 147 148 149
+  * T_param_dim_0   (T_param_dim_0) int64 0 1 2
+  * T_param_dim_1   (T_param_dim_1) int64 0 1 2
+Data variables:
+    v0              (chain, draw, x) float64 -6.303 45.23 5.299 ... 45.23 5.306
+    sigv            (chain, draw) float64 0.1037 0.0987 0.104 ... 0.1028 0.1002
+    a_model         (chain, draw, a_model_dim_0, a_model_dim_1) float64 23.24 ... 18.95
+    rv_model        (chain, draw, rv_model_dim_0) float64 42.07 41.79 ... 35.94
+    T_param         (chain, draw, T_param_dim_0, T_param_dim_1) float64 0.1346 ... 2.193
+Attributes:
+    created_at:                 2019-05-22T21:57:36.938397
+    inference_library:          pystan
+    inference_library_version:  2.18.0.0
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">azfit</span><span class="o">.</span><span class="n">sample_stats</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;xarray.Dataset&gt;
+Dimensions:      (chain: 4, draw: 1000)
+Coordinates:
+  * chain        (chain) int64 0 1 2 3
+  * draw         (draw) int64 0 1 2 3 4 5 6 7 ... 993 994 995 996 997 998 999
+Data variables:
+    accept_stat  (chain, draw) float64 0.8102 0.9105 0.9356 ... 0.9653 0.813
+    stepsize     (chain, draw) float64 0.1635 0.1635 0.1635 ... 0.171 0.171
+    treedepth    (chain, draw) int64 5 6 5 5 5 5 5 5 5 5 ... 6 7 6 10 6 5 6 5 6
+    n_leapfrog   (chain, draw) int64 31 63 31 63 31 31 ... 1023 127 63 127 31 63
+    diverging    (chain, draw) bool False False False ... False False False
+    energy       (chain, draw) float64 -1.252e+03 -1.248e+03 ... -1.273e+03
+    lp           (chain, draw) float64 1.326e+03 1.335e+03 ... 1.345e+03
+Attributes:
+    created_at:                 2019-05-22T21:57:36.944296
+    inference_library:          pystan
+    inference_library_version:  2.18.0.0
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">v0_diff</span> <span class="o">=</span> <span class="n">stanfit</span><span class="p">[</span><span class="s1">'v0'</span><span class="p">]</span> <span class="o">-</span> <span class="n">cl</span><span class="o">.</span><span class="n">v0</span><span class="p">[</span><span class="kc">None</span><span class="p">,:]</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">color</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'tab:blue'</span><span class="p">,</span> <span class="s1">'tab:green'</span><span class="p">,</span> <span class="s1">'tab:orange'</span><span class="p">]</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">v0_diff</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">histtype</span><span class="o">=</span><span class="s1">'step'</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="p">[</span><span class="s1">'x'</span><span class="p">,</span><span class="s1">'y'</span><span class="p">,</span><span class="s1">'z'</span><span class="p">],</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"diff from truth [km/s]"</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">'upper left'</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">'gray'</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">.5</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/tutorial_46_0.png" src="_images/tutorial_46_0.png"/>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">az</span><span class="o">.</span><span class="n">plot_posterior</span><span class="p">(</span><span class="n">azfit</span><span class="p">,</span> <span class="n">var_names</span><span class="o">=</span><span class="p">[</span><span class="s1">'sigv'</span><span class="p">]);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/tutorial_47_0.png" src="_images/tutorial_47_0.png"/>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">az</span><span class="o">.</span><span class="n">plot_posterior</span><span class="p">(</span><span class="n">azfit</span><span class="p">,</span> <span class="n">var_names</span><span class="o">=</span><span class="p">[</span><span class="s1">'T_param'</span><span class="p">],</span> <span class="n">coords</span><span class="o">=</span><span class="p">{</span><span class="s1">'T_param_dim_0'</span><span class="p">:[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">'T_param_dim_1'</span><span class="p">:[</span><span class="mi">0</span><span class="p">]});</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/tutorial_48_0.png" src="_images/tutorial_48_0.png"/>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[38]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">bottom</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="mf">0.15</span><span class="p">)</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">cax</span><span class="p">,</span> <span class="n">cT</span><span class="p">,</span> <span class="n">truth</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">stanfit</span><span class="p">[</span><span class="s2">"T_param"</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">cl</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">ravel</span><span class="p">()):</span>
+    <span class="n">cax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">cT</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">histtype</span><span class="o">=</span><span class="s2">"step"</span><span class="p">)</span>
+    <span class="n">cax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">truth</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">"k"</span><span class="p">)</span>
+    <span class="n">cax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">"gray"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.55</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">,</span> <span class="s2">"m/s/pc"</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">"center"</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s2">"center"</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.55</span><span class="p">,</span> <span class="s2">"Density"</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">"center"</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s2">"center"</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">"mock_posterior_T.png"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/tutorial_49_0.png" src="_images/tutorial_49_0.png"/>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">az</span><span class="o">.</span><span class="n">summary</span><span class="p">(</span><span class="n">azfit</span><span class="p">,</span> <span class="n">var_names</span><span class="o">=</span><span class="p">[</span><span class="s1">'v0'</span><span class="p">,</span> <span class="s1">'sigv'</span><span class="p">,</span> <span class="s1">'T_param'</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<div class="table-wrapper"><table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>mean</th>
+<th>sd</th>
+<th>mcse_mean</th>
+<th>mcse_sd</th>
+<th>hpd_3%</th>
+<th>hpd_97%</th>
+<th>ess_mean</th>
+<th>ess_sd</th>
+<th>ess_bulk</th>
+<th>ess_tail</th>
+<th>r_hat</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>v0[0]</th>
+<td>-6.312</td>
+<td>0.009</td>
+<td>0.000</td>
+<td>0.000</td>
+<td>-6.329</td>
+<td>-6.295</td>
+<td>4194.0</td>
+<td>4193.0</td>
+<td>4182.0</td>
+<td>3104.0</td>
+<td>1.0</td>
+</tr>
+<tr>
+<th>v0[1]</th>
+<td>45.233</td>
+<td>0.011</td>
+<td>0.000</td>
+<td>0.000</td>
+<td>45.213</td>
+<td>45.255</td>
+<td>3715.0</td>
+<td>3715.0</td>
+<td>3726.0</td>
+<td>2801.0</td>
+<td>1.0</td>
+</tr>
+<tr>
+<th>v0[2]</th>
+<td>5.309</td>
+<td>0.009</td>
+<td>0.000</td>
+<td>0.000</td>
+<td>5.292</td>
+<td>5.325</td>
+<td>3736.0</td>
+<td>3736.0</td>
+<td>3744.0</td>
+<td>2761.0</td>
+<td>1.0</td>
+</tr>
+<tr>
+<th>sigv</th>
+<td>0.102</td>
+<td>0.004</td>
+<td>0.000</td>
+<td>0.000</td>
+<td>0.094</td>
+<td>0.110</td>
+<td>4079.0</td>
+<td>4065.0</td>
+<td>4091.0</td>
+<td>2782.0</td>
+<td>1.0</td>
+</tr>
+<tr>
+<th>T_param[0,0]</th>
+<td>-0.193</td>
+<td>1.470</td>
+<td>0.023</td>
+<td>0.026</td>
+<td>-2.713</td>
+<td>2.825</td>
+<td>4264.0</td>
+<td>1603.0</td>
+<td>4248.0</td>
+<td>2994.0</td>
+<td>1.0</td>
+</tr>
+<tr>
+<th>T_param[0,1]</th>
+<td>-49.671</td>
+<td>1.497</td>
+<td>0.024</td>
+<td>0.017</td>
+<td>-52.673</td>
+<td>-47.076</td>
+<td>4041.0</td>
+<td>4041.0</td>
+<td>4047.0</td>
+<td>2859.0</td>
+<td>1.0</td>
+</tr>
+<tr>
+<th>T_param[0,2]</th>
+<td>18.266</td>
+<td>1.330</td>
+<td>0.021</td>
+<td>0.015</td>
+<td>15.793</td>
+<td>20.782</td>
+<td>4000.0</td>
+<td>4000.0</td>
+<td>4002.0</td>
+<td>2856.0</td>
+<td>1.0</td>
+</tr>
+<tr>
+<th>T_param[1,0]</th>
+<td>53.288</td>
+<td>1.709</td>
+<td>0.027</td>
+<td>0.019</td>
+<td>49.914</td>
+<td>56.317</td>
+<td>4033.0</td>
+<td>4033.0</td>
+<td>4037.0</td>
+<td>2718.0</td>
+<td>1.0</td>
+</tr>
+<tr>
+<th>T_param[1,1]</th>
+<td>3.204</td>
+<td>1.761</td>
+<td>0.028</td>
+<td>0.021</td>
+<td>0.158</td>
+<td>6.763</td>
+<td>3929.0</td>
+<td>3461.0</td>
+<td>3938.0</td>
+<td>2981.0</td>
+<td>1.0</td>
+</tr>
+<tr>
+<th>T_param[1,2]</th>
+<td>-38.332</td>
+<td>1.551</td>
+<td>0.024</td>
+<td>0.017</td>
+<td>-41.152</td>
+<td>-35.436</td>
+<td>4335.0</td>
+<td>4335.0</td>
+<td>4326.0</td>
+<td>3082.0</td>
+<td>1.0</td>
+</tr>
+<tr>
+<th>T_param[2,0]</th>
+<td>-19.730</td>
+<td>1.366</td>
+<td>0.021</td>
+<td>0.015</td>
+<td>-22.275</td>
+<td>-17.212</td>
+<td>4171.0</td>
+<td>4171.0</td>
+<td>4169.0</td>
+<td>2701.0</td>
+<td>1.0</td>
+</tr>
+<tr>
+<th>T_param[2,1]</th>
+<td>42.125</td>
+<td>1.415</td>
+<td>0.022</td>
+<td>0.016</td>
+<td>39.570</td>
+<td>44.876</td>
+<td>4161.0</td>
+<td>4161.0</td>
+<td>4166.0</td>
+<td>3082.0</td>
+<td>1.0</td>
+</tr>
+<tr>
+<th>T_param[2,2]</th>
+<td>2.086</td>
+<td>1.235</td>
+<td>0.019</td>
+<td>0.015</td>
+<td>-0.092</td>
+<td>4.417</td>
+<td>4306.0</td>
+<td>3546.0</td>
+<td>4309.0</td>
+<td>2835.0</td>
+<td>1.0</td>
+</tr>
+</tbody>
+</table></div>
+</div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+
+      </article>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="models.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Available models</div>
+              </div>
+              <svg><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="tutorial-mock.html">
+              <svg><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Making a mock cluster</div>
+                
+              </div>
+            </a>
+        </div>
+
+        <div class="related-information">
+              Copyright &#169; 2019-2021, Semyeong Oh
+            |
+            Built with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+              and
+              <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+              <a href="https://github.com/pradyunsg/furo">Furo theme</a>.
+            |
+            <a class="muted-link" href="_sources/tutorial.ipynb.txt"
+               rel="nofollow">
+              Show Source
+            </a>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            Contents
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Getting started with Kinesis</a><ul>
+<li><a class="reference internal" href="#Making-and-observing-a-mock-cluster">Making and observing a mock cluster</a></li>
+<li><a class="reference internal" href="#Fitting-the-mock-data">Fitting the mock data</a><ul>
+<li><a class="reference internal" href="#Basic-cluster-model-with-partial-RVs">Basic cluster model with partial RVs</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Cluster-with-rotation">Cluster with rotation</a></li>
+<li><a class="reference internal" href="#Cluster-with-rotation---ideal-case">Cluster with rotation - ideal case</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/scripts/main.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    </body>
+</html>
