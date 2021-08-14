@@ -1,3 +1,8 @@
+// Copyright (c) Semyeong Oh.
+//
+// This source code is licensed under the MIT license found in the
+// LICENSE file in the root directory of this source tree.
+//
 // A model of proper motions and RVs of stars in a cluster
 // including linear velocity field and anisotropic velocity dispersion.
 // Contamination is taken into account by two-component mixture model.
@@ -34,7 +39,7 @@ data {
 }
 
 transformed data {
-  matrix[3,3] M[N];      // to equitorial rectangular coordinates
+  matrix[3,3] M[N];      // to equatorial rectangular coordinates
   real ra_rad[N];
   real dec_rad[N];
   for (i in 1:N) {

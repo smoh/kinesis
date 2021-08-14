@@ -1,3 +1,8 @@
+// Copyright (c) Semyeong Oh
+
+// This source code is licensed under the MIT license found in the
+// LICENSE file in the root directory of this source tree.
+//
 // Model of proper motions of stars in a cluster
 // assuming isotropic dispersion.
 data {
@@ -16,7 +21,7 @@ data {
 }
 
 transformed data {
-  matrix[2,3] M[N];      // to equitorial rectangular coordinates
+  matrix[2,3] M[N];      // to equatorial rectangular coordinates
   real ra_rad[N];
   real dec_rad[N];
   for (i in 1:N) {
@@ -54,15 +59,14 @@ model {
   matrix[3,3] D[N];       // modified covariance matrix
 
 
-  // v0 ~ normal(0, 100);
-  // sigv ~ normal(0, 10);
+  v0 ~ normal(0, 30);
+  sigv ~ cauchy(0, 2.5);
 
   // likelihood
   for(i in 1:N) {
     D[i] = C[i];
     D[i,2,2] += sigv^2 / (d[i]/1000.)^2 / 4.74^2;
     D[i,3,3] += sigv^2 / (d[i]/1000.)^2 / 4.74^2;
-    // print(i, D[i])
   }
 
   for(i in 1:N) {
