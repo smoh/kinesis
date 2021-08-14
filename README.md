@@ -10,7 +10,7 @@ with astrometry and (incomplete) radial velocity data of its members.
 In the most general model, the stars can be a mixture of background (contamination)
 and the cluster, for which the (3,3) velocity dispersion matrix and
 velocity gradient (dv_x/dx, dv_y/dx, ...) are included.
-Please refer to [Oh & Evans 2020](https://arxiv.org/abs/2007.02969) for full details.
+Please refer to [Oh & Evans 2020](https://ui.adsabs.harvard.edu/abs/2020MNRAS.498.1920O) for full details.
 There are also simpler versions of the most general model and
 utilities to generate mock clusters and mock observations.
 
@@ -20,22 +20,25 @@ development and may be incomplete).
 
 ## Attribution
 
-If you make use of this code, please cite [Oh & Evans 2020](https://arxiv.org/abs/2007.02969).
+If you make use of this code, please cite [Oh & Evans 2020](https://ui.adsabs.harvard.edu/abs/2020MNRAS.498.1920O).
 The bibtex entry is:
+
 ```
-@ARTICLE{2020arXiv200702969O,
-       author = {{Oh}, Semyeong and {Evans}, N. Wyn},
-        title = "{Kinematic modelling of clusters with Gaia: the Death Throes of the Hyades}",
-      journal = {arXiv e-prints},
-     keywords = {Astrophysics - Solar and Stellar Astrophysics, Astrophysics - Astrophysics of Galaxies},
+@ARTICLE{2020MNRAS.498.1920O,
+       author = {{Oh}, Semyeong and {Evans}, Neil Wyn},
+        title = "{Kinematic modelling of clusters with Gaia: the death throes of the Hyades}",
+      journal = {\mnras},
+     keywords = {methods: data analysis, software: data analysis, astrometry, stars: distances, stars: fundamental parameters, open clusters and associations: individual: Hyades, Astrophysics - Solar and Stellar Astrophysics, Astrophysics - Astrophysics of Galaxies},
          year = 2020,
-        month = jul,
-          eid = {arXiv:2007.02969},
-        pages = {arXiv:2007.02969},
+        month = oct,
+       volume = {498},
+       number = {2},
+        pages = {1920-1938},
+          doi = {10.1093/mnras/staa2381},
 archivePrefix = {arXiv},
        eprint = {2007.02969},
  primaryClass = {astro-ph.SR},
-       adsurl = {https://ui.adsabs.harvard.edu/abs/2020arXiv200702969O},
+       adsurl = {https://ui.adsabs.harvard.edu/abs/2020MNRAS.498.1920O},
       adsnote = {Provided by the SAO/NASA Astrophysics Data System}
 }
 ```
