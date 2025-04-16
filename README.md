@@ -2,7 +2,7 @@
 
 Kinematic modelling of clusters with the [Gaia](https://www.cosmos.esa.int/web/gaia/home) data.
 
-<a href="https://smoh.space/kinesis"><img src="https://github.com/smoh/kinesis/workflows/docs/badge.svg"></a>
+<a href="https://smoh.github.io/kinesis"><img src="https://github.com/smoh/kinesis/workflows/docs/badge.svg"></a>
 [![codecov](https://codecov.io/gh/smoh/kinesis/branch/master/graph/badge.svg)](https://codecov.io/gh/smoh/kinesis)
 
 Kinesis is a package for fitting the internal kinematics of a star cluster
@@ -14,7 +14,7 @@ Please refer to [Oh & Evans 2020](https://ui.adsabs.harvard.edu/abs/2020MNRAS.49
 There are also simpler versions of the most general model and
 utilities to generate mock clusters and mock observations.
 
-Check out the [documentation](https://smoh.space/kinesis) (it is under
+Check out the [documentation](https://smoh.github.io/kinesis) (it is under
 development and may be incomplete).
 
 
